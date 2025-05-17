@@ -1,9 +1,11 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4-00C04F79EFBC}") = "AutoRefineOpenAI", "AutoRefineOpenAI\AutoRefineOpenAI\AutoRefineOpenAI.csproj", "{8687D0CB-F255-4F41-9EEA-D11CFA2DE3D2}"
+Project("{00000000-0000-0000-0000-000000000000}") = "AutoRefineOpenAI", "AutoRefineOpenAI\AutoRefineOpenAI\AutoRefineOpenAI.csproj", "{8687D0CB-F255-4F41-9EEA-D11CFA2DE3D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{A1B2C3D4-E5F6-7890-1234-56789ABCDEF0}"
+Project("{00000000-0000-0000-0000-000000000000}") = "Services", "Services\Services.csproj", "{A1B2C3D4-E5F6-7890-1234-56789ABCDEF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4-00C04F79EFBC}") = "UTests", "UTests\UTests.csproj", "{B2C3D4E5-F678-9012-3456-7890ABCDEF12}"
+Project("{00000000-0000-0000-0000-000000000000}") = "UTests", "UTests\UTests.csproj", "{B2C3D4E5-F678-9012-3456-7890ABCDEF12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra", "Infra\Infra.csproj", "{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,5 +25,9 @@ Global
 		{B2C3D4E5-F678-9012-3456-7890ABCDEF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2C3D4E5-F678-9012-3456-7890ABCDEF12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2C3D4E5-F678-9012-3456-7890ABCDEF12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
