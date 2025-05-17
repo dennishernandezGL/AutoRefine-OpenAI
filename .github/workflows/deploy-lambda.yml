@@ -30,7 +30,9 @@ jobs:
         working-directory: OpenAILambda/src/OpenAILambda
         run: |
           dotnet restore
-          dotnet publish -c Release
+          dotnet publish -c Release \
+            -o bin/Release/net6.0/publish \
+            /p:PublishReadyToRun=false
 
       - name: Restore & Build CDK app
         working-directory: Infra
