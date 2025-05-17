@@ -1,0 +1,17 @@
+{
+  "name_field": {
+    "label": "Full Name",
+    "placeholder": "John Doe",
+    "type": "text"
+  },
+  "email_field": {
+    "label": "Work Email",
+    "placeholder": "you@company.com",
+    "type": "email"
+  },
+  "feedback_field": {
+    "label": "Quick Feedback",
+    "placeholder": "e.g., My issue is...",
+    "type": "textarea"
+  }
+}
