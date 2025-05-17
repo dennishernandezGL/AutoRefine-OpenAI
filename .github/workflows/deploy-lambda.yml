@@ -11,7 +11,7 @@ jobs:
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      LAMBDA_PATH: OpenAILambda/bin/Release/net6.0/publish
+      LAMBDA_PATH: OpenAILambda/bin/Release/net9.0/publish
 
     steps:
       - name: Checkout repository
@@ -43,7 +43,7 @@ jobs:
           dotnet restore Services/Services.csproj
           dotnet publish Services/Services.csproj \
             -c Release \
-            -o ${{ github.workspace }}/Services/bin/Release/net6.0/publish    
+            -o ${{ github.workspace }}/Services/bin/Release/net9.0/publish    
 
       - name: Restore & Build CDK app
         working-directory: Infra
