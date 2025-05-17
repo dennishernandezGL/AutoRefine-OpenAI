@@ -138,10 +138,10 @@ public class WebApiStack : Stack
         });
 
         // Output the public URL
-        new CfnOutput(this, "WebApiUrl", new CfnOutputProps
+        /*new CfnOutput(this, "WebApiUrl", new CfnOutputProps
         {
             Value = $"http://{instance.InstancePublicDnsName}",
             Description = "URL of the Web API"
-        });
+        });*/
     }
 }
