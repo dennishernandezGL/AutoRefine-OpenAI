@@ -15,18 +15,18 @@ namespace Services.Services
         }
 
         [HttpPost("LogInfo")]
-        public IActionResult LogInfo([FromBody] string message)
+        public IActionResult LogInfo([FromBody] string message, [FromBody] string @object)
         {
             var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration); // Passing IConfiguration as second parameter
-            loggingFacade.LogInfo(message, new { test = "test" }, new Context()); // Assuming Context is a class you have defined
+            loggingFacade.LogInfo(message, @object, new Context()); // Assuming Context is a class you have defined
             return Ok("Info logged successfully.");
         }
 
         [HttpPost("LogWarning")]
-        public IActionResult LogWarning([FromBody] string message)
+        public IActionResult LogWarning([FromBody] string message, [FromBody] string @object)
         {
             var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration); // Passing IConfiguration as second parameter
-            loggingFacade.LogWarning(message, new { test = "test" }, new Context());
+            loggingFacade.LogWarning(message, @object, new Context());
             return Ok("Warning logged successfully.");
         }
 

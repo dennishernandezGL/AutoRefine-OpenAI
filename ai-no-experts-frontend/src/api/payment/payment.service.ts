@@ -4,9 +4,7 @@ import type { Payment } from '../../models/payment.model';
 
 export const submitPayment = async (data: Payment) => {
   try {
-    const response = await axios.post('/form-ai/recommend', {
-      logs: [{ values: data }],
-    });
+    const response = await axios.post('/LogInfo', data);
   
     return {
       statusCode: response.status,

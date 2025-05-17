@@ -20,10 +20,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install AWS CDK CLI
-        run: npm install -g aws-cdk
+        run: npm install -g aws-cdk@latest
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
@@ -69,15 +69,6 @@ jobs:
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION --require-approval never
-
-      - name: Print Current Directory and Structure
-        run: |
-          pwd
-          ls -la
-          echo "Infra directory:"
-          ls -la Infra
-          echo "Lambda directory:"
-          ls -la ${{ env.LAMBDA_PATH }}
 
       - name: CDK Synth
         working-directory: Infra

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Services.Services;
 using Services.Logging;
+using AutoRefineOpenAI;
+using AutoRefineOpenAI.Controllers;
 
 namespace UTests
 {
@@ -11,6 +13,7 @@ namespace UTests
     {
         private readonly LogControllerService _controller;
         private readonly MonitoringControllerService _monitoringController;
+        private readonly IngestController _ingestController;
 
         public IntegrationTest()
         {
@@ -22,6 +25,7 @@ namespace UTests
 
             _controller = new LogControllerService(configuration);
             _monitoringController = new MonitoringControllerService(configuration);
+            _ingestController = new IngestController(configuration);
         }
 
         [Fact]
@@ -31,7 +35,7 @@ namespace UTests
             string testMessage = "Test Info Message";
 
             // Act
-            var result = _controller.LogInfo(testMessage);
+            var result = _controller.LogInfo(testMessage, Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }));
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -45,7 +49,7 @@ namespace UTests
             string testMessage = "Test Warning Message";
 
             // Act
-            var result = _controller.LogWarning(testMessage);
+            var result = _controller.LogWarning(testMessage, Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }));
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -83,7 +87,8 @@ namespace UTests
             // Arrange
 
             // Act
-            var result = await _monitoringController.RetrieveLogs(new MonitoringControllerService.DateRange{
+            var result = await _monitoringController.RetrieveLogs(new MonitoringControllerService.DateRange
+            {
                 StartDate = DateTime.UtcNow.AddDays(-1),
                 EndDate = DateTime.UtcNow,
                 EventName = "info"//LogType.Info.ToString()
