@@ -8,6 +8,7 @@ namespace Services.Services
     [Route("api/[controller]")]
     public class LogControllerService : ControllerBase
     {
+    //THIS IS A TEST
         private readonly IConfiguration _configuration;
 
         public LogControllerService(IConfiguration configuration)
