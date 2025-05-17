@@ -48,11 +48,11 @@ test('should measure performance metrics', async ({ page }) => {
     return JSON.stringify(navigationEntry.toJSON(), null, 2);
   });
 
-  const metricsDir = 'test-results/metrics';
+  const metricsDir = 'tests/metrics';
   if (!fs.existsSync(metricsDir)) {
     fs.mkdirSync(metricsDir, {recursive: true});
   }
-  
-  fs.writeFileSync(`${metricsDir}/performance-metrics.json`, performanceMetrics);
+
+  fs.writeFileSync(`${metricsDir}/performance-metrics-${new Date().toISOString().replace(/:/g, '-')}.json`, performanceMetrics);
   console.log('Performance Metrics:', JSON.parse(performanceMetrics));
 });
