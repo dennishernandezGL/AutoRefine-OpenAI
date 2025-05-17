@@ -7,6 +7,8 @@ Project("{00000000-0000-0000-0000-000000000000}") = "UTests", "UTests\UTests.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra", "Infra\Infra.csproj", "{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAILambda", "OpenAILambda\src\OpenAILambda\OpenAILambda.csproj", "{3FA32C45-E88B-4DA3-B929-1438B6FEAE1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,5 +31,9 @@ Global
 		{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D57B25E5-A401-4C71-A1E0-3B6FF2742FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FA32C45-E88B-4DA3-B929-1438B6FEAE1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FA32C45-E88B-4DA3-B929-1438B6FEAE1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FA32C45-E88B-4DA3-B929-1438B6FEAE1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FA32C45-E88B-4DA3-B929-1438B6FEAE1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
