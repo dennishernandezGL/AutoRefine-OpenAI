@@ -29,19 +29,26 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: Restore & Publish Lambda
-        working-directory: OpenAILambda/src/OpenAILambda
+      - name: Restore dependencies
         run: |
-          dotnet restore
-          dotnet publish -c Release \
-            -o bin/Release/net6.0/publish \
+          dotnet restore OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
+          dotnet restore Infra/Infra.csproj
+
+      - name: Publish Lambda
+        run: |
+          dotnet publish OpenAILambda/src/OpenAILambda/OpenAILambda.csproj \
+            -c Release \
+            -o ./OpenAILambda/bin/Release/net6.0/publish \
             /p:PublishReadyToRun=false
 
-      - name: Restore & Build CDK app
-        working-directory: Infra
+      - name: Verify Lambda output directory
         run: |
-          dotnet restore
-          dotnet build --configuration Release
+          ls -la ./OpenAILambda/bin/Release/net6.0/publish
+          echo "Lambda output directory verified"
+
+      - name: Build CDK app
+        working-directory: Infra
+        run: dotnet build --configuration Release
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
