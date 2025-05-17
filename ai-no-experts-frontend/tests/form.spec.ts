@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import * as fs from 'fs';
 
 test('submits form with valid data', async ({page}) => {
   await page.goto('http://localhost:5175/');
@@ -39,3 +40,19 @@ test('validates email format', async ({page}) => {
   await expect(page.locator('input[name="email"]')).toHaveAttribute('aria-invalid', 'true');
 });
 
+test('should measure performance metrics', async ({ page }) => {
+  await page.goto('http://localhost:5175/');
+
+  const performanceMetrics = await page.evaluate(() => {
+    const [navigationEntry] = performance.getEntriesByType('navigation');
+    return JSON.stringify(navigationEntry.toJSON(), null, 2);
+  });
+
+  const metricsDir = 'test-results/metrics';
+  if (!fs.existsSync(metricsDir)) {
+    fs.mkdirSync(metricsDir, {recursive: true});
+  }
+  
+  fs.writeFileSync(`${metricsDir}/performance-metrics.json`, performanceMetrics);
+  console.log('Performance Metrics:', JSON.parse(performanceMetrics));
+});
