@@ -8,9 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: [ '6.0.x', '9.0.x' ]
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -31,7 +28,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: '6.0.x'
 
       - name: Restore & Publish Lambda
         run: |
