@@ -14,23 +14,16 @@ namespace OpenAILambda;
 public class Function
 {
     private readonly IServiceProvider _serviceProvider;
-    
-    public Function()
+    private readonly IConfiguration _configuration;
+
+    public Function(IConfiguration configuration)
     {
-        var config = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddEnvironmentVariables()
-            .Build();
-        
-        var services = new ServiceCollection();
-        services.AddSingleton<IConfiguration>(config);
-        _serviceProvider = services.BuildServiceProvider();
+        _configuration = configuration;
     }
     
     public async Task<string> FunctionHandler(string input, ILambdaContext context)
     {
-        var githubService = new GithubService(_serviceProvider.GetService<IConfiguration>()!);
+        var githubService = new GithubService(_configuration);
 
         var files = await githubService.GetRepositoryFilesAsync();
 
@@ -108,7 +101,7 @@ public class Function
                 messages.Add(ChatMessage.CreateUserMessage( $"# LOGS\n```\n{trimmedLogs}\n```"));
             }
 
-            messages.Add(ChatMessage.CreateUserMessage( @"Please return only the code snippet with reason, path, physical lines, code change in json format."));
+            messages.Add(ChatMessage.CreateUserMessage( @"Please return only the code snippet with reason of the change, filepath, physical file lines (same as file editor), and code change, in json format."));
 
             var client = new ChatClient(model: "gpt-4o", apiKey: "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");
             var result = await client.CompleteChatAsync(messages);
