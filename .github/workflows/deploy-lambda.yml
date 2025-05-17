@@ -27,13 +27,13 @@ jobs:
           dotnet-version: '6.0.x'
 
       - name: Restore & Publish Lambda
-        working-directory: lambda/MyLambda
+        working-directory: OpenAILambda/src/OpenAILambda
         run: |
           dotnet restore
-          dotnet publish -c Release -o publish
+          dotnet publish -c Release
 
       - name: Restore & Build CDK app
-        working-directory: infra
+        working-directory: Infra
         run: |
           dotnet restore
           dotnet build --configuration Release
@@ -46,11 +46,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: CDK Bootstrap
-        working-directory: infra
+        working-directory: Infra
         run: |
           cdk bootstrap --require-approval never
 
       - name: CDK Deploy
-        working-directory: infra
+        working-directory: Infra
         run: |
           cdk deploy InfraStack --require-approval never
