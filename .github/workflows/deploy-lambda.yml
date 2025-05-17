@@ -27,7 +27,7 @@ jobs:
           dotnet-version: '6.0.x'
 
       - name: Restore & Publish Lambda
-        working-directory: lambda/MyLambda
+        working-directory: OpenAILambda
         run: |
           dotnet restore
           dotnet publish -c Release -o publish
