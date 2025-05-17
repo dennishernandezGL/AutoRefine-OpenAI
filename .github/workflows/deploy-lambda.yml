@@ -32,7 +32,7 @@ jobs:
 
       - name: Restore & Publish Lambda
         run: |
-          dotnet restore --framework net9.0 OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
+          dotnet restore OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
           dotnet publish OpenAILambda/src/OpenAILambda/OpenAILambda.csproj \
             -c Release --framework net9.0 \
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
@@ -40,7 +40,7 @@ jobs:
           
       - name: Restore & Publish Web API
         run: |
-          dotnet restore --framework net9.0 Services/Services.csproj
+          dotnet restore Services/Services.csproj
           dotnet publish Services/Services.csproj \
             -c Release --framework net9.0 \
             -o ${{ github.workspace }}/Services/bin/Release/net9.0/publish    
