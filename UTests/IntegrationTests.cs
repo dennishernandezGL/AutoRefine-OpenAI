@@ -14,7 +14,6 @@ namespace UTests
     {
         private readonly LogControllerService _controller;
         private readonly MonitoringControllerService _monitoringController;
-        private readonly IngestController _ingestController;
 
         public IntegrationTest()
         {
@@ -30,7 +29,6 @@ namespace UTests
                 
             _controller = new LogControllerService(configuration);
             _monitoringController = new MonitoringControllerService(configuration);
-            _ingestController = new IngestController(configuration);
         }
 
         [Fact]
