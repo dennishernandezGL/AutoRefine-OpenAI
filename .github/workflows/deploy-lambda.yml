@@ -1,0 +1,56 @@
+name: Deploy .NET CDK + Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install AWS CDK CLI
+        run: npm install -g aws-cdk
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore & Publish Lambda
+        working-directory: lambda/MyLambda
+        run: |
+          dotnet restore
+          dotnet publish -c Release -o publish
+
+      - name: Restore & Build CDK app
+        working-directory: infra
+        run: |
+          dotnet restore
+          dotnet build --configuration Release
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: CDK Bootstrap
+        working-directory: infra
+        run: |
+          cdk bootstrap --require-approval never
+
+      - name: CDK Deploy
+        working-directory: infra
+        run: |
+          cdk deploy InfraStack --require-approval never
