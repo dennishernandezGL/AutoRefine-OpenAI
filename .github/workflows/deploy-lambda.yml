@@ -49,7 +49,7 @@ jobs:
         working-directory: Infra
         run: |
           dotnet restore
-          dotnet build --configuration Release
+          dotnet build --configuration --framework net9.0 Release
 
       - name: Update InfraStack with correct path
         run: |
