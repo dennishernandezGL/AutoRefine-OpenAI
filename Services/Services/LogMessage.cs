@@ -15,6 +15,12 @@ namespace Services.Services
             _configuration = configuration;
         }
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok("Hello World!");
+        }
+        
         [HttpPost("LogInfo")]
         public IActionResult LogInfo([FromBody] Request request)
         {
