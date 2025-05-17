@@ -74,16 +74,16 @@ jobs:
       - name: CDK Synth
         working-directory: Infra
         run: |
-          cdk synth --app "dotnet run -c Release --framework net6.0 --no-build" || (echo "CDK synth failed"; exit 1)
+          cdk synth --app "dotnet run -c Release --no-build" || (echo "CDK synth failed"; exit 1)
 
       - name: CDK Deploy
         working-directory: Infra
         run: |
-          cdk deploy InfraStack --app "dotnet run -c Release --framework net6.0 --no-build" --require-approval never
+          cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never
           
       - name: CDK Deploy EC2 Stack
         working-directory: Infra
         run: |
           cdk deploy WebApiStack \
-            --app "dotnet run -c Release --framework net6.0 --no-build" \
+            --app "dotnet run -c Release --no-build" \
             --require-approval never    
