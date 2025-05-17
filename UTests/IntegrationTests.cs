@@ -14,6 +14,7 @@ namespace UTests
     {
         private readonly LogControllerService _controller;
         private readonly MonitoringControllerService _monitoringController;
+        private readonly IngestController _ingestController;
 
         public IntegrationTest()
         {
@@ -26,9 +27,10 @@ namespace UTests
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables() // Add environment variables
                 .Build();
-                
+
             _controller = new LogControllerService(configuration);
             _monitoringController = new MonitoringControllerService(configuration);
+            _ingestController = new IngestController(configuration);
         }
 
         [Fact]
@@ -38,7 +40,12 @@ namespace UTests
             string testMessage = "Test Info Message";
 
             // Act
-            var result = _controller.LogInfo(testMessage, Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }));
+            var result = _controller.LogInfo(new Request
+            {
+                Message = testMessage,
+                Object = Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }),
+                Context = new Context()
+            });
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -52,7 +59,12 @@ namespace UTests
             string testMessage = "Test Warning Message";
 
             // Act
-            var result = _controller.LogWarning(testMessage, Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }));
+            var result = _controller.LogWarning(new Request
+            {
+                Message = testMessage,
+                Object = Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }),
+                Context = new Context()
+            });
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
