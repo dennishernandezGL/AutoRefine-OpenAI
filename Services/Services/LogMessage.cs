@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration; // Added missing using directive
 namespace Services.Services
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/log")]
     public class LogControllerService : ControllerBase
     {
         private readonly IConfiguration _configuration;

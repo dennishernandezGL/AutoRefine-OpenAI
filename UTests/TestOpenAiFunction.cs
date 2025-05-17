@@ -1,4 +1,5 @@
 using DotNetEnv;
+using Microsoft.Extensions.Configuration;
 using OpenAILambda;
 
 namespace UTests;
@@ -6,13 +7,21 @@ namespace UTests;
 public class TestOpenAiFunction
 {
     private readonly Function _openAiFunction;
-    
+
     public TestOpenAiFunction()
     {
         // Load environment variables from .env file
         Env.Load("../../../../.env");
 
-        _openAiFunction = new Function();
+        
+        // Load configuration from appsettings.json
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables() // Add environment variables
+                .Build();
+
+        _openAiFunction = new Function(configuration);
     }
 
     [Fact]

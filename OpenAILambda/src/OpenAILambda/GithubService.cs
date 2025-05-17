@@ -18,7 +18,7 @@ public class GithubService
 
         this.GitHubConfiguration = new CreateBranchRequest()
         {
-            GitHubToken = "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",
+            GitHubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? throw new ArgumentNullException("GITHUB_TOKEN"),
             Owner = _configuration["GitHub:Owner"] ?? throw new ArgumentNullException("GitHub:Owner"),
             Repository = _configuration["GitHub:Repository"] ?? throw new ArgumentNullException("GitHub:Repository"),
             BaseBranch = _configuration["GitHub:BaseBranch"] ?? throw new ArgumentNullException("GitHub:BaseBranch"),
