@@ -80,6 +80,42 @@ public class IngestController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpPost("create-pull-request")]
+    public async Task<IActionResult> CreatePullRequest([FromBody] CreatePullRequest request)
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"token {GitHubConfiguration.GitHubToken}");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", GitHubConfiguration.UserAgent);
+
+            var pullRequestPayload = new
+            {
+                title = $"Pull Request for {request.BranchName} to {request.BaseBranch}",
+                head = request.BranchName,
+                @base = request.BaseBranch,
+                body = request.Body
+            };
+
+            var pullRequestResponse = await httpClient.PostAsJsonAsync(
+                $"https://api.github.com/repos/{GitHubConfiguration.Owner}/{GitHubConfiguration.Repository}/pulls",
+                pullRequestPayload);
+
+            if (!pullRequestResponse.IsSuccessStatusCode)
+            {
+                return BadRequest("Failed to create the pull request.");
+            }
+
+            var pullRequestData = await pullRequestResponse.Content.ReadAsStringAsync();
+            return Ok($"Pull request created successfully: {pullRequestData}");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
     public class GitHubBranchResponse
     {
         public GitHubBranchObject Object { get; set; }
@@ -104,4 +140,11 @@ public class CreateBranchRequest
     public required string Repository { get; set; }
     public required string BaseBranch { get; set; }
     public required string UserAgent { get; set; }
+}
+
+public class CreatePullRequest
+{
+    public required string BranchName { get; set; }
+    public required string BaseBranch { get; set; }
+    public required string Body { get; set; }
 }

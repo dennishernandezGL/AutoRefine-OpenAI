@@ -116,7 +116,7 @@ namespace UTests
         public async Task CreateBranch_ShouldReturnOkResult()
         {
             // Arrange
-            
+
 
             // Act
             var result = await _ingestController.CreateBranch("AI-branch01") as OkObjectResult;
@@ -124,6 +124,24 @@ namespace UTests
             // Assert
             Assert.NotNull(result);
             Assert.Equal("Branch created successfully.", result.Value);
+        }
+        
+        [Fact]
+        public async Task CreatePullRequest_ShouldReturnOkResult()
+        {
+            // Arrange
+
+            // Act
+            var result = await _ingestController.CreatePullRequest(new CreatePullRequest
+            {
+                BranchName = "AI-branch01",
+                BaseBranch = "main",
+                Body = "This is a test pull request Body."
+            }) as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Contains("Pull request created successfully.", result.Value.ToString());
         }
     }
 }
