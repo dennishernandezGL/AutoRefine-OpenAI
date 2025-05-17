@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-east-2
   ECS_CLUSTER: homely-turtle-71tzpr
-  ECS_SERVICE: WebApi-EC2-service-4q3iws5g
+  ECS_SERVICE: WebApi-EC2-service-prmaopmz
   ECS_TASK_FAMILY: WebApi-EC2
   DOCKER_IMAGE: dperezro/glwebapi
 
