@@ -14,6 +14,7 @@ namespace UTests
     {
         private readonly LogControllerService _controller;
         private readonly MonitoringControllerService _monitoringController;
+        private readonly RepositoryConnections _repositoryConnections;
         private readonly IngestController _ingestController;
 
         public IntegrationTest()
@@ -31,6 +32,7 @@ namespace UTests
             _controller = new LogControllerService(configuration);
             _monitoringController = new MonitoringControllerService(configuration);
             _ingestController = new IngestController(configuration);
+            _repositoryConnections = new RepositoryConnections(configuration);
         }
 
         [Fact]
@@ -119,7 +121,7 @@ namespace UTests
 
 
             // Act
-            var result = await _ingestController.CreateBranch("AI-branch01") as OkObjectResult;
+            var result = await _repositoryConnections.CreateBranch("AI-branch01") as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);
@@ -132,7 +134,7 @@ namespace UTests
             // Arrange
 
             // Act
-            var result = await _ingestController.CreatePullRequest(new CreatePullRequest
+            var result = await _repositoryConnections.CreatePullRequest(new CreatePullRequest
             {
                 BranchName = "AI-branch01",
                 BaseBranch = "main",
@@ -141,7 +143,7 @@ namespace UTests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Contains("Pull request created successfully.", result.Value.ToString());
+            Assert.Equal("Pull request created successfully.", result.Value);
         }
     }
 }
