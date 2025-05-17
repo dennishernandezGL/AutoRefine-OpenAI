@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy-lambda:
     runs-on: ubuntu-latest
 
     env:
@@ -24,12 +24,7 @@ jobs:
 
       - name: Install AWS CDK CLI
         run: npm install -g aws-cdk@latest
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0.x'
-          
+        
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v3
         with:
@@ -43,13 +38,6 @@ jobs:
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
             /p:PublishReadyToRun=false
           
-      - name: Restore & Publish Web API
-        run: |
-          dotnet restore Services/Services.csproj
-          dotnet publish Services/Services.csproj \
-            -c Release --framework net9.0 \
-            -o ${{ github.workspace }}/Services/bin/Release/net9.0/publish    
-
       - name: Restore & Build CDK app
         working-directory: Infra
         run: |
@@ -76,19 +64,64 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION --require-approval never
 
-     # - name: CDK Synth
-     #   working-directory: Infra
-     #   run: |
-     #     cdk synth --app "dotnet run -c Release --no-build" || (echo "CDK synth failed"; exit 1)
-
       - name: CDK Deploy
         working-directory: Infra
         run: |
           cdk deploy InfraStack --app "dotnet run -c Release --framework net6.0 --no-build" --require-approval never
-          
+           
+  deploy-ec2:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      LAMBDA_PATH: OpenAILambda/bin/Release/net6.0/publish
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install AWS CDK CLI
+        run: npm install -g aws-cdk@latest
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore & Publish Web API
+        run: |
+          dotnet restore Services/Services.csproj
+          dotnet publish Services/Services.csproj \
+            -c Release --framework net9.0 \
+            -o ${{ github.workspace }}/Services/bin/Release/net9.0/publish    
+
+      - name: Restore & Build CDK app
+        working-directory: Infra
+        run: |
+          dotnet restore
+          dotnet build --configuration Release
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: CDK Bootstrap
+        working-directory: Infra
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION --require-approval never
+      
       - name: CDK Deploy EC2 Stack
         working-directory: Infra
         run: |
           cdk deploy WebApiStack \
             --app "dotnet run -c Release --framework net9.0 --no-build" \
-            --require-approval never    
+            --require-approval never            
