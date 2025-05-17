@@ -51,6 +51,45 @@ public class RepositoryConnections : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpPost("create-commit")]
+    public async Task<IActionResult> CreateCommit([FromBody] CreateCommitRequest request)
+    {
+        try
+        {
+
+            var commitResponse = await ARepository.Create(Repositories.Repositories.GitHub, _configuration)
+                .CommitChanges(request.FileChanges.ToDictionary(
+                    change => change.FileName,
+                    change => new List<(int Line, string Change)> { (change.LineNumber, change.NewLine) }),
+                    request.CommitDescription,
+                    request.BranchName);
+            if (commitResponse.StatusCode != 0)
+            {
+                return BadRequest(commitResponse.Message);
+            }
+
+            return Ok("Commit created successfully.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+public class CreateCommitRequest
+{
+    public required List<FileChange> FileChanges { get; set; }
+    public required string CommitDescription { get; set; }
+    public required string BranchName { get; set; }
+}
+
+public class FileChange
+{
+    public required string FileName { get; set; }
+    public required int LineNumber { get; set; }
+    public required string NewLine { get; set; }
+}
 }
 
 public class CreatePullRequest
