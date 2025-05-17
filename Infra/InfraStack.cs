@@ -34,11 +34,11 @@ public class InfraStack : Stack
         
         rule.AddTarget(new LambdaFunction(fn));
         
-        new CfnOutput(this, "LogGroupUrl", new CfnOutputProps
+        /*new CfnOutput(this, "LogGroupUrl", new CfnOutputProps
         {
             Value = $"https://console.aws.amazon.com/cloudwatch/home?region={this.Region}#logsV2:log-groups/log-group/{fn.LogGroup.LogGroupName}",
             Description = "URL to CloudWatch Logs for the Lambda function"
-        });
+        });*/
         
         new CfnOutput(this, "LambdaFunctionArn", new CfnOutputProps
         {
@@ -46,10 +46,10 @@ public class InfraStack : Stack
             Description = "ARN of the Lambda function"
         });
         
-        new CfnOutput(this, "ScheduleRuleName", new CfnOutputProps
+        /*new CfnOutput(this, "ScheduleRuleName", new CfnOutputProps
         {
             Value = rule.RuleName,
             Description = "Name of the EventBridge rule that schedules the Lambda"
-        });
+        });*/
     }
 }
