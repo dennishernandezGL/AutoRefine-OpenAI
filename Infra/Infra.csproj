@@ -9,8 +9,10 @@
 
     <ItemGroup>
       <PackageReference Include="Amazon.CDK" Version="1.204.0" />
+      <PackageReference Include="Amazon.CDK.AWS.EC2" Version="1.204.0" />
       <PackageReference Include="Amazon.CDK.AWS.Events.Targets" Version="1.204.0" />
       <PackageReference Include="Amazon.CDK.AWS.Lambda" Version="1.204.0" />
+      <PackageReference Include="Amazon.CDK.AWS.S3.Deployment" Version="1.204.0" />
     </ItemGroup>
 
 </Project>

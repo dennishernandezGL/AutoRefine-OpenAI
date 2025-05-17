@@ -37,6 +37,13 @@ jobs:
             -c Release \
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
             /p:PublishReadyToRun=false
+          
+      - name: Restore & Publish Web API
+        run: |
+          dotnet restore Services/src/WebApi/WebApi.csproj
+          dotnet publish Services/src/WebApi/WebApi.csproj \
+            -c Release \
+            -o ${{ github.workspace }}/Services/bin/Release/net6.0/publish    
 
       - name: Verify Lambda output directory
         run: |
@@ -79,3 +86,10 @@ jobs:
         working-directory: Infra
         run: |
           cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never
+          
+      - name: CDK Deploy EC2 Stack
+        working-directory: Infra
+        run: |
+          cdk deploy WebApiStack \
+            --app "dotnet run -c Release --no-build" \
+            --require-approval never    
