@@ -1,5 +1,6 @@
 using Services.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration; // Added missing using directive
 
 namespace Services.Services
 {
@@ -15,18 +16,18 @@ namespace Services.Services
         }
 
         [HttpPost("LogInfo")]
-        public IActionResult LogInfo([FromBody] string message, [FromBody] string @object)
+        public IActionResult LogInfo([FromBody] Request request)
         {
             var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration); // Passing IConfiguration as second parameter
-            loggingFacade.LogInfo(message, @object, new Context()); // Assuming Context is a class you have defined
+            loggingFacade.LogInfo(request.Message, Newtonsoft.Json.JsonConvert.DeserializeObject<object>(request.Object), request.Context); // Assuming Context is a class you have defined
             return Ok("Info logged successfully.");
         }
 
         [HttpPost("LogWarning")]
-        public IActionResult LogWarning([FromBody] string message, [FromBody] string @object)
+        public IActionResult LogWarning([FromBody] Request request)
         {
             var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration); // Passing IConfiguration as second parameter
-            loggingFacade.LogWarning(message, @object, new Context());
+            loggingFacade.LogWarning(request.Message, Newtonsoft.Json.JsonConvert.DeserializeObject<object>(request.Object), request.Context);
             return Ok("Warning logged successfully.");
         }
 
@@ -37,5 +38,12 @@ namespace Services.Services
             loggingFacade.LogError(message, new { test = "test" }, new Context());
             return Ok("Error logged successfully.");
         }
+    }
+
+    public class Request
+    {
+        public string Message { get; set; }
+        public string Object { get; set; }
+        public Context Context { get; set; }
     }
 }
