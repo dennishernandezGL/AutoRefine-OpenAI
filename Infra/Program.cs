@@ -8,6 +8,7 @@ public class Program
     {
         var app = new App();
         _ = new InfraStack(app, "InfraStack");
+        //_ = new WebApiStack(app, "WebApiStack");
         app.Synth();
     }
 }

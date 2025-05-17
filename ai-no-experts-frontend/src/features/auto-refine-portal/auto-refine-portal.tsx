@@ -22,12 +22,20 @@ const AutoRefinePortal = () => {
             setErrorMessage('');
             
             const response = await submitPayment(values);
-
-            if (response.statusCode === 201) {
-                // setRecommendations(response.data);
-                setSuccessMessage('Data sent successfully');
+            
+            if (response.statusCode === 200) {
+                setSuccessMessage(response.data);
             } else {
-                setErrorMessage('Error fetching AI Recommendations');
+                const errors = response.data?.errors;
+                if (errors) {
+                    const errorMessages = Object.entries(errors)
+                        .map(([field, messages]: any) => `${field}: ${messages.join(', ')}`)
+                        .join(' | ');
+
+                    setErrorMessage(errorMessages);
+                } else {
+                    setErrorMessage("An unknown error occurred.");
+                }
             }
 
             setIsLoading(false);

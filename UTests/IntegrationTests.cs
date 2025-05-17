@@ -6,6 +6,7 @@ using Services.Services;
 using Services.Logging;
 using AutoRefineOpenAI;
 using AutoRefineOpenAI.Controllers;
+using DotNetEnv; // Add this
 
 namespace UTests
 {
@@ -17,10 +18,14 @@ namespace UTests
 
         public IntegrationTest()
         {
+            // Load environment variables from .env file
+            Env.Load("../../../../.env");
+
             // Load configuration from appsettings.json
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables() // Add environment variables
                 .Build();
 
             _controller = new LogControllerService(configuration);
@@ -35,7 +40,12 @@ namespace UTests
             string testMessage = "Test Info Message";
 
             // Act
-            var result = _controller.LogInfo(testMessage, Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }));
+            var result = _controller.LogInfo(new Request
+            {
+                Message = testMessage,
+                Object = Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }),
+                Context = new Context()
+            });
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -49,7 +59,12 @@ namespace UTests
             string testMessage = "Test Warning Message";
 
             // Act
-            var result = _controller.LogWarning(testMessage, Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }));
+            var result = _controller.LogWarning(new Request
+            {
+                Message = testMessage,
+                Object = Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" }),
+                Context = new Context()
+            });
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -79,8 +94,6 @@ namespace UTests
             Assert.Equal("Error logged successfully.", ((OkObjectResult)result).Value);
         }
 
-
-
         [Fact]
         public async Task LogRetrieve_ShouldReturnOkResult()
         {
@@ -97,6 +110,38 @@ namespace UTests
             // Assert
             Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(((OkObjectResult)result).Value);
+        }
+
+        [Fact]
+        public async Task CreateBranch_ShouldReturnOkResult()
+        {
+            // Arrange
+
+
+            // Act
+            var result = await _ingestController.CreateBranch("AI-branch01") as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Branch created successfully.", result.Value);
+        }
+        
+        [Fact]
+        public async Task CreatePullRequest_ShouldReturnOkResult()
+        {
+            // Arrange
+
+            // Act
+            var result = await _ingestController.CreatePullRequest(new CreatePullRequest
+            {
+                BranchName = "AI-branch01",
+                BaseBranch = "main",
+                Body = "This is a test pull request Body."
+            }) as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Contains("Pull request created successfully.", result.Value.ToString());
         }
     }
 }

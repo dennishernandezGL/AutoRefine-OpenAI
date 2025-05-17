@@ -53,7 +53,7 @@ public class WebApiStack : Stack
         // Upload deployment package to S3
         var deployment = new BucketDeployment(this, "DeploymentAssets", new BucketDeploymentProps
         {
-            Sources = new[] { Source.Asset("../Services/bin/Release/net6.0/publish") },
+            Sources = new[] { Source.Asset("../Services/bin/Release/net9.0/publish") },
             DestinationBucket = deploymentBucket,
             DestinationKeyPrefix = "webapp",
             Prune = true
@@ -134,14 +134,14 @@ public class WebApiStack : Stack
             MachineImage = MachineImage.LatestAmazonLinux(),
             Role = role,
             UserData = userData,
-            KeyName = "webapi-key" // Asegúrate de crear esta key pair en la consola de AWS
+            //KeyName = "webapi-key"
         });
 
         // Output the public URL
-        new CfnOutput(this, "WebApiUrl", new CfnOutputProps
+        /*new CfnOutput(this, "WebApiUrl", new CfnOutputProps
         {
             Value = $"http://{instance.InstancePublicDnsName}",
             Description = "URL of the Web API"
-        });
+        });*/
     }
 }

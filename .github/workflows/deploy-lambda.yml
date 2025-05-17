@@ -46,6 +46,11 @@ jobs:
           # Ensure the pipeline stops if tests fail
           if [ $? -ne 0 ]; then exit 1; fi
 
+      - name: Setup .NET SDK 9
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'    
+
       - name: Restore & Publish Lambda
         run: |
           dotnet restore OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
@@ -59,6 +64,13 @@ jobs:
           echo "Lambda publish directory: ${{ github.workspace }}/${{ env.LAMBDA_PATH }}"
           ls -la ${{ github.workspace }}/${{ env.LAMBDA_PATH }}
           echo "Lambda output directory verified"
+            
+      - name: Publish Web API (.NET 9)
+        run: |
+          dotnet restore Services/Services.csproj
+          dotnet publish Services/Services.csproj \
+            -c Release --framework net9.0 \
+            -o ${{ github.workspace }}/Services/bin/Release/net9.0/publish
 
       - name: Restore & Build CDK app
         working-directory: Infra
@@ -94,4 +106,4 @@ jobs:
       - name: CDK Deploy
         working-directory: Infra
         run: |
-          cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never
+          cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never      

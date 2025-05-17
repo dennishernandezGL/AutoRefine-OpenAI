@@ -17,9 +17,9 @@ namespace Services.Logging.MixPanel
             MixPanelImportUrl = configuration["MixPanel:ImportUrl"] ?? throw new ArgumentNullException("MixPanel:ImportUrl");
             MixPanelExportUrl = configuration["MixPanel:ExportUrl"] ?? throw new ArgumentNullException("MixPanel:ExportUrl");
             MixPanelJqltUrl = configuration["MixPanel:JqltUrl"] ?? throw new ArgumentNullException("MixPanel:JqltUrl");
-            MixPanelToken = configuration["MixPanel:Token"] ?? throw new ArgumentNullException("MixPanel:Token");
-            MixPanelApiKey = configuration["MixPanel:ApiKey"] ?? throw new ArgumentNullException("MixPanel:ApiKey");
-            MixPanelApiSecret = configuration["MixPanel:ApiSecret"] ?? throw new ArgumentNullException("MixPanel:ApiSecret");
+            MixPanelToken = Environment.GetEnvironmentVariable("MIXPANEL_TOKEN") ?? throw new ArgumentNullException("MIXPANEL_TOKEN");
+            MixPanelApiKey = Environment.GetEnvironmentVariable("MIXPANEL_API_KEY") ?? throw new ArgumentNullException("MIXPANEL_API_KEY");
+            MixPanelApiSecret = Environment.GetEnvironmentVariable("MIXPANEL_API_SECRET") ?? throw new ArgumentNullException("MIXPANEL_API_SECRET");
         }
 
         public override void LogInfo(string message, object jsonStructure, Context context)
