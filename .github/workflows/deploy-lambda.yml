@@ -56,20 +56,12 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION --require-approval never
 
-      - name: CDK Deploy
-        working-directory: Infra
-        run: |
-          cdk deploy InfraStack --require-approval never
-          
       - name: CDK Synth
         working-directory: Infra
         run: |
-          cdk synth \
-            --app "dotnet run -c Release --no-build" 
+          cdk synth --app "dotnet run -c Release --no-build"
 
       - name: CDK Deploy
         working-directory: Infra
         run: |
-          cdk deploy InfraStack \
-            --app "dotnet run -c Release --no-build" \
-            --require-approval never    
+          cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never
