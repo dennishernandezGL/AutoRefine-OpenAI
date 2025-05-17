@@ -30,6 +30,11 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
+      - name: Setup .NET SDK 9
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'    
+
       - name: Restore & Publish Lambda
         run: |
           dotnet restore OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
@@ -37,12 +42,13 @@ jobs:
             -c Release \
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
             /p:PublishReadyToRun=false
-
-      - name: Verify Lambda output directory
+            
+      - name: Publish Web API (.NET 9)
         run: |
-          echo "Lambda publish directory: ${{ github.workspace }}/${{ env.LAMBDA_PATH }}"
-          ls -la ${{ github.workspace }}/${{ env.LAMBDA_PATH }}
-          echo "Lambda output directory verified"
+          dotnet restore Services/Services.csproj
+          dotnet publish Services/Services.csproj \
+            -c Release --framework net9.0 \
+            -o ${{ github.workspace }}/Services/bin/Release/net9.0/publish
 
       - name: Restore & Build CDK app
         working-directory: Infra
