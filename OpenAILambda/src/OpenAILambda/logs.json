@@ -1,0 +1,232 @@
+[
+  {
+    "event": "User Login",
+    "properties": {
+      "distinct_id": "user_12345",
+      "time": 1716054823,
+      "$browser": "Chrome",
+      "$browser_version": "121.0.0.0",
+      "$os": "Windows",
+      "$os_version": "10",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/login",
+      "$referrer": "https://google.com",
+      "login_method": "email",
+      "success": true,
+      "login_time_seconds": 1.45,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852318958
+    }
+  },
+  {
+    "event": "Page View",
+    "properties": {
+      "distinct_id": "user_12345",
+      "time": 1716054830,
+      "$browser": "Chrome",
+      "$browser_version": "121.0.0.0",
+      "$os": "Windows",
+      "$os_version": "10",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/dashboard",
+      "$referrer": "https://myapp.com/login",
+      "page_title": "User Dashboard",
+      "page_load_time_ms": 1243,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852324102
+    }
+  },
+  {
+    "event": "Feature Used",
+    "properties": {
+      "distinct_id": "user_12345",
+      "time": 1716054950,
+      "$browser": "Chrome",
+      "$browser_version": "121.0.0.0",
+      "$os": "Windows",
+      "$os_version": "10",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/dashboard",
+      "feature_name": "data_export",
+      "feature_category": "reporting",
+      "export_format": "csv",
+      "export_size_kb": 256,
+      "processing_time_ms": 3214,
+      "success": true,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852388741
+    }
+  },
+  {
+    "event": "API Request",
+    "properties": {
+      "distinct_id": "user_12345",
+      "time": 1716055023,
+      "endpoint": "/api/v1/data",
+      "method": "GET",
+      "response_time_ms": 432,
+      "status_code": 200,
+      "request_size_bytes": 1024,
+      "response_size_bytes": 15360,
+      "cache_hit": false,
+      "mp_lib": "server",
+      "mp_processing_time_ms": 1684852402159
+    }
+  },
+  {
+    "event": "Error",
+    "properties": {
+      "distinct_id": "user_12345",
+      "time": 1716055108,
+      "$browser": "Chrome",
+      "$browser_version": "121.0.0.0",
+      "$os": "Windows",
+      "$os_version": "10",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/dashboard/reports",
+      "error_type": "api_error",
+      "error_message": "Failed to fetch data: timeout after 30s",
+      "component": "ReportingWidget",
+      "endpoint": "/api/v1/reports/generate",
+      "retry_count": 2,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852458201
+    }
+  },
+  {
+    "event": "Feature Used",
+    "properties": {
+      "distinct_id": "user_67890",
+      "time": 1716055200,
+      "$browser": "Firefox",
+      "$browser_version": "115.0",
+      "$os": "macOS",
+      "$os_version": "13.2",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/dashboard",
+      "feature_name": "data_visualization",
+      "feature_category": "analytics",
+      "chart_type": "line",
+      "data_points": 128,
+      "time_range_days": 30,
+      "rendering_time_ms": 856,
+      "success": true,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852503045
+    }
+  },
+  {
+    "event": "User Logout",
+    "properties": {
+      "distinct_id": "user_12345",
+      "time": 1716055300,
+      "$browser": "Chrome",
+      "$browser_version": "121.0.0.0",
+      "$os": "Windows",
+      "$os_version": "10",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/settings",
+      "session_duration_seconds": 477,
+      "pages_viewed": 4,
+      "features_used": 2,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852603112
+    }
+  },
+  {
+    "event": "Warning",
+    "properties": {
+      "distinct_id": "user_67890",
+      "time": 1716055402,
+      "$browser": "Firefox",
+      "$browser_version": "115.0",
+      "$os": "macOS",
+      "$os_version": "13.2",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/dashboard/analytics",
+      "warning_type": "performance",
+      "warning_message": "Rendering large dataset (10000+ points) may cause UI lag",
+      "component": "TimeSeriesChart",
+      "data_size": 12584,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852705229
+    }
+  },
+  {
+    "event": "Purchase",
+    "properties": {
+      "distinct_id": "user_54321",
+      "time": 1716055500,
+      "$browser": "Safari",
+      "$browser_version": "16.3",
+      "$os": "iOS",
+      "$os_version": "16.2",
+      "$device": "iPhone",
+      "$current_url": "https://myapp.com/checkout/confirmation",
+      "product_id": "premium_subscription",
+      "plan": "annual",
+      "currency": "USD",
+      "amount": 99.99,
+      "payment_method": "credit_card",
+      "is_first_purchase": false,
+      "coupon_used": true,
+      "coupon_code": "SPRING25",
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684852803471
+    }
+  },
+  {
+    "event": "Performance Metrics",
+    "properties": {
+      "distinct_id": "system",
+      "time": 1716055600,
+      "metric_type": "server",
+      "cpu_usage_percent": 68.5,
+      "memory_usage_mb": 4256.8,
+      "active_connections": 1243,
+      "database_queries_per_second": 156.7,
+      "average_response_time_ms": 245.3,
+      "cache_hit_ratio": 0.82,
+      "error_rate_percent": 0.34,
+      "mp_lib": "server",
+      "mp_processing_time_ms": 1684852903288
+    }
+  },
+  {
+    "event": "Feature Used",
+    "properties": {
+      "distinct_id": "user_12345",
+      "time": 1716055700,
+      "$browser": "Chrome",
+      "$browser_version": "121.0.0.0",
+      "$os": "Windows",
+      "$os_version": "10",
+      "$device": "Desktop",
+      "$current_url": "https://myapp.com/dashboard/integrations",
+      "feature_name": "api_integration",
+      "feature_category": "developer",
+      "integration_type": "webhook",
+      "configuration_time_seconds": 145,
+      "success": true,
+      "error_count": 0,
+      "mp_lib": "javascript",
+      "mp_processing_time_ms": 1684853003542
+    }
+  },
+  {
+    "event": "Error",
+    "properties": {
+      "distinct_id": "system",
+      "time": 1716055800,
+      "error_type": "database_error",
+      "error_message": "Connection timeout after 60s",
+      "database": "user_analytics",
+      "query_type": "aggregation",
+      "affected_users": 28,
+      "retry_success": true,
+      "retry_count": 1,
+      "mp_lib": "server",
+      "mp_processing_time_ms": 1684853101984
+    }
+  }
+]
