@@ -12,6 +12,7 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       LAMBDA_PATH: OpenAILambda/bin/Release/net6.0/publish
+      TEST_BASE_URL: ${{ secrets.TEST_BASE_URL }} # Define the test base URL in GitHub Secrets
 
     steps:
       - name: Checkout repository
@@ -30,6 +31,20 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
+      # Install dependencies in the `ai-no-experts-frontend` directory
+      - name: Install Dependencies for Testing
+        working-directory: ./ai-no-experts-frontend
+        run: npm install
+
+      # Run Playwright tests using the actual test URL
+      - name: Run Tests (form.spec.ts)
+        working-directory: ./ai-no-experts-frontend
+        run: |
+          echo "Running Playwright tests against ${{ env.TEST_BASE_URL }}"
+          npx playwright test tests/form.spec.ts --project=chromium --base-url ${{ env.TEST_BASE_URL }}
+          # Ensure the pipeline stops if tests fail
+          if [ $? -ne 0 ]; then exit 1; fi
+
       - name: Restore & Publish Lambda
         run: |
           dotnet restore OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
@@ -37,13 +52,6 @@ jobs:
             -c Release \
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
             /p:PublishReadyToRun=false
-          
-      - name: Restore & Publish Web API
-        run: |
-          dotnet restore Services/src/WebApi/WebApi.csproj
-          dotnet publish Services/src/WebApi/WebApi.csproj \
-            -c Release \
-            -o ${{ github.workspace }}/Services/bin/Release/net6.0/publish    
 
       - name: Verify Lambda output directory
         run: |
@@ -86,10 +94,3 @@ jobs:
         working-directory: Infra
         run: |
           cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never
-          
-      - name: CDK Deploy EC2 Stack
-        working-directory: Infra
-        run: |
-          cdk deploy WebApiStack \
-            --app "dotnet run -c Release --no-build" \
-            --require-approval never    
