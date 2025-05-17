@@ -29,12 +29,17 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
+          
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'    
 
       - name: Restore & Publish Lambda
         run: |
           dotnet restore OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
           dotnet publish OpenAILambda/src/OpenAILambda/OpenAILambda.csproj \
-            -c Release --framework net9.0 \
+            -c Release \
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
             /p:PublishReadyToRun=false
           
@@ -49,7 +54,7 @@ jobs:
         working-directory: Infra
         run: |
           dotnet restore
-          dotnet build --configuration Release --framework net9.0
+          dotnet build --configuration Release
 
       - name: Update InfraStack with correct path
         run: |
@@ -74,12 +79,12 @@ jobs:
       - name: CDK Synth
         working-directory: Infra
         run: |
-          cdk synth --app "dotnet run -c Release --framework net9.0 --no-build" || (echo "CDK synth failed"; exit 1)
+          cdk synth --app "dotnet run -c Release --no-build" || (echo "CDK synth failed"; exit 1)
 
       - name: CDK Deploy
         working-directory: Infra
         run: |
-          cdk deploy InfraStack --app "dotnet run -c Release --framework net9.0 --no-build" --require-approval never
+          cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never
           
       - name: CDK Deploy EC2 Stack
         working-directory: Infra
