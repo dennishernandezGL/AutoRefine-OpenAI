@@ -60,3 +60,16 @@ jobs:
         working-directory: Infra
         run: |
           cdk deploy InfraStack --require-approval never
+          
+      - name: CDK Synth
+        working-directory: Infra
+        run: |
+          cdk synth \
+            --app "dotnet run -c Release --no-build" 
+
+      - name: CDK Deploy
+        working-directory: Infra
+        run: |
+          cdk deploy InfraStack \
+            --app "dotnet run -c Release --no-build" \
+            --require-approval never    
