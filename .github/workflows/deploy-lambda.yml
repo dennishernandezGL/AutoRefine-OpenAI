@@ -33,16 +33,16 @@ jobs:
       - name: Restore & Publish Lambda
         run: |
           dotnet restore --framework net9.0 OpenAILambda/src/OpenAILambda/OpenAILambda.csproj
-          dotnet publish --framework net9.0 OpenAILambda/src/OpenAILambda/OpenAILambda.csproj \
-            -c Release \
+          dotnet publish OpenAILambda/src/OpenAILambda/OpenAILambda.csproj \
+            -c Release --framework net9.0 \
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
             /p:PublishReadyToRun=false
           
       - name: Restore & Publish Web API
         run: |
           dotnet restore --framework net9.0 Services/Services.csproj
-          dotnet publish --framework net9.0 Services/Services.csproj \
-            -c Release \
+          dotnet publish Services/Services.csproj \
+            -c Release --framework net9.0 \
             -o ${{ github.workspace }}/Services/bin/Release/net9.0/publish    
 
       - name: Restore & Build CDK app
