@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy-lambda:
+  deploy:
     runs-on: ubuntu-latest
 
     env:
@@ -24,11 +24,11 @@ jobs:
 
       - name: Install AWS CDK CLI
         run: npm install -g aws-cdk@latest
-        
-      - name: Setup .NET 6
+
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'    
+          dotnet-version: '6.0.x'
 
       - name: Restore & Publish Lambda
         run: |
@@ -37,7 +37,13 @@ jobs:
             -c Release \
             -o ${{ github.workspace }}/${{ env.LAMBDA_PATH }} \
             /p:PublishReadyToRun=false
-          
+
+      - name: Verify Lambda output directory
+        run: |
+          echo "Lambda publish directory: ${{ github.workspace }}/${{ env.LAMBDA_PATH }}"
+          ls -la ${{ github.workspace }}/${{ env.LAMBDA_PATH }}
+          echo "Lambda output directory verified"
+
       - name: Restore & Build CDK app
         working-directory: Infra
         run: |
@@ -64,7 +70,12 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION --require-approval never
 
+      - name: CDK Synth
+        working-directory: Infra
+        run: |
+          cdk synth --app "dotnet run -c Release --no-build" || (echo "CDK synth failed"; exit 1)
+
       - name: CDK Deploy
         working-directory: Infra
         run: |
-          cdk deploy InfraStack --app "dotnet run -c Release --framework net6.0 --no-build" --require-approval never
+          cdk deploy InfraStack --app "dotnet run -c Release --no-build" --require-approval never
