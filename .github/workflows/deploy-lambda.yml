@@ -11,7 +11,7 @@ jobs:
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      LAMBDA_PATH: OpenAILambda/bin/Release/net9.0/publish
+      LAMBDA_PATH: OpenAILambda/bin/Release/net6.0/publish
 
     steps:
       - name: Checkout repository
