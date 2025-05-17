@@ -18,7 +18,7 @@ namespace Services.Services
         public IActionResult LogInfo([FromBody] string message, [FromBody] string @object)
         {
             var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration); // Passing IConfiguration as second parameter
-            loggingFacade.LogInfo(message, @object, new Context()); // Assuming Context is a class you have defined
+            loggingFacade.LogInfo(message, Newtonsoft.Json.JsonConvert.DeserializeObject<object>(@object), new Context()); // Assuming Context is a class you have defined
             return Ok("Info logged successfully.");
         }
 
@@ -26,7 +26,7 @@ namespace Services.Services
         public IActionResult LogWarning([FromBody] string message, [FromBody] string @object)
         {
             var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration); // Passing IConfiguration as second parameter
-            loggingFacade.LogWarning(message, @object, new Context());
+            loggingFacade.LogWarning(message, Newtonsoft.Json.JsonConvert.DeserializeObject<object>(@object), new Context());
             return Ok("Warning logged successfully.");
         }
 

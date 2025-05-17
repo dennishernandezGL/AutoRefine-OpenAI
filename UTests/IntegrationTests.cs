@@ -6,6 +6,7 @@ using Services.Services;
 using Services.Logging;
 using AutoRefineOpenAI;
 using AutoRefineOpenAI.Controllers;
+using DotNetEnv; // Add this
 
 namespace UTests
 {
@@ -17,12 +18,16 @@ namespace UTests
 
         public IntegrationTest()
         {
+            // Load environment variables from .env file
+            Env.Load("../../../../.env");
+
             // Load configuration from appsettings.json
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables() // Add environment variables
                 .Build();
-
+                
             _controller = new LogControllerService(configuration);
             _monitoringController = new MonitoringControllerService(configuration);
             _ingestController = new IngestController(configuration);
@@ -79,8 +84,6 @@ namespace UTests
             Assert.Equal("Error logged successfully.", ((OkObjectResult)result).Value);
         }
 
-
-
         [Fact]
         public async Task LogRetrieve_ShouldReturnOkResult()
         {
@@ -97,6 +100,20 @@ namespace UTests
             // Assert
             Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(((OkObjectResult)result).Value);
+        }
+
+        [Fact]
+        public async Task CreateBranch_ShouldReturnOkResult()
+        {
+            // Arrange
+            
+
+            // Act
+            var result = await _ingestController.CreateBranch("AI-branch01") as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Branch created successfully.", result.Value);
         }
     }
 }
