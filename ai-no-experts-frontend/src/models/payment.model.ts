@@ -1,12 +1,13 @@
 export type Payment = {
     billingAddress: string;
     billingAddress2: string;
-    cardNumber: string;
     country: string;
-    cvv: string;
     email: string;
-    expirationDate: string;
     fullName: string;
     phone: string;
-    ssn: string;
+    // Sensitive information should be handled securely and not stored in plain text.
+    cardNumberHash: string;
+    cvvHash: string;
+    expirationDateHash: string;
+    ssnHash: string;
 }

@@ -16,7 +16,12 @@ const AutoRefinePortal = () => {
 
     // const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
-    const onPaymentFormSubmit = async (values: Payment) => {             
+    const onPaymentFormSubmit = async (values: Payment) => {
+        if (!validatePayment(values)) {
+            setErrorMessage("Payment details are invalid.");
+            return;
+        }
+
         try {
             setIsLoading(true);
             setErrorMessage('');
@@ -44,6 +49,15 @@ const AutoRefinePortal = () => {
             console.error('Submission error:', error);
             setErrorMessage(`Error: ${error.message}`);
         }
+    }
+
+    const validatePayment = (values: Payment): boolean => {
+        // Add logic to validate the payment details
+        if (!values || !values.amount || isNaN(values.amount) || values.amount <= 0) {
+            return false;
+        }
+        // Assuming there are more fields to validate, add them here
+        return true;
     }
 
     return (

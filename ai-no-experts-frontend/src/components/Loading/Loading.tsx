@@ -8,9 +8,9 @@ const Loading: FunctionComponent<LoadingProps> = ({
     label = '',
 }) => {
     return (
-        <Backdrop sx={{ color: '#fff', zIndex: 10000 }}open={isOpen}>
+        <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isOpen}>
             <CircularProgress color="inherit" />
-            {label && <Typography variant='body1'>Test</Typography>}
+            {label && <Typography variant='body1'>{label}</Typography>}
         </Backdrop>
     );
 }

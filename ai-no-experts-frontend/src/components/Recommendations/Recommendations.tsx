@@ -1,9 +1,9 @@
 import { Box, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, memo } from 'react';
 
 import type { Recommendation } from '../../models/log.model';
 
-const Recommendations: FunctionComponent<RecommendationsProps> = ({
+const Recommendations: FunctionComponent<RecommendationsProps> = memo(({
     recommendations = [],
 }) => {
   return (
@@ -42,6 +42,7 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
     </Container>    
   );
 }
+);
 
 interface RecommendationsProps {
   recommendations?: Recommendation[];

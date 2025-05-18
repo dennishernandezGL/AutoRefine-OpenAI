@@ -1,4 +1,4 @@
-export class LogInfoRequest {    
+export class LogInfoRequest {
     context: {
         componentName: string;
         loggerUser: string;
@@ -18,13 +18,23 @@ export class LogInfoRequest {
         } = {},
         data: object = {}
       ) {
-        this.message = message;
+        this.message = this.sanitize(message);
         this.context = {
-          componentName: context.componentName || '',
-          loggerUser: context.loggerUser || '',
-          environment: context.environment || '',
-          instanceIdentifier: context.instanceIdentifier || '',
+          componentName: this.sanitize(context.componentName) || '',
+          loggerUser: this.sanitize(context.loggerUser) || '',
+          environment: this.sanitize(context.environment) || '',
+          instanceIdentifier: this.sanitize(context.instanceIdentifier) || '',
         };
-        this.object = JSON.stringify(data);
+        this.object = JSON.stringify(this.sanitizeObject(data));
       }
+    
+    private sanitize(input: string = ''): string {
+        return input.replace(/[<>]/g, ''); // Simple sanitization for example purposes
+    }
+
+    private sanitizeObject(obj: object): object {
+        return JSON.parse(JSON.stringify(obj, (key, value) => {
+            return (typeof value === 'string') ? this.sanitize(value) : value;
+        }));
+    }
 }
