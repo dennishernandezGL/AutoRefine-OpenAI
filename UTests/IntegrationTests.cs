@@ -15,7 +15,7 @@ namespace UTests
         private readonly LogControllerService _controller;
         private readonly MonitoringControllerService _monitoringController;
         private readonly RepositoryConnections _repositoryConnections;
-        private readonly IngestController _ingestController;
+        private readonly OpenAiController _openAiController;
 
         public IntegrationTest()
         {
@@ -31,7 +31,7 @@ namespace UTests
 
             _controller = new LogControllerService(configuration);
             _monitoringController = new MonitoringControllerService(configuration, null);
-            _ingestController = new IngestController(configuration);
+            _openAiController = new OpenAiController(configuration);
             _repositoryConnections = new RepositoryConnections(configuration);
         }
 
@@ -127,7 +127,7 @@ namespace UTests
             Assert.NotNull(result);
             Assert.Equal("Branch created successfully.", result.Value);
         }
-        
+
         [Fact]
         public async Task CreatePullRequest_ShouldReturnOkResult()
         {
@@ -144,6 +144,19 @@ namespace UTests
             // Assert
             Assert.NotNull(result);
             Assert.Equal("Pull request created successfully.", result.Value);
+        }
+
+        [Fact]
+        public async Task AnalyzeCode_ShouldReturnOkResult()
+        {
+            // Arrange
+
+            // Act
+            var result = await _openAiController.FunctionHandler();
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            Assert.NotNull(((OkObjectResult)result).Value);
         }
     }
 }

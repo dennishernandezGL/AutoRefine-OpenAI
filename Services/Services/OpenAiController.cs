@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI.Chat;
 using Services.Helpers;
+using Services.Logging;
 using Services.Models;
 using Services.Repositories;
 
@@ -11,28 +12,24 @@ namespace Services.Services;
 
 [Route("api/[controller]")]
 [ApiController]
-public class OpenAiController(GithubService githubService, MixpanelService mixpanelService,
-    IConfiguration configuration) : ControllerBase
+public class OpenAiController(IConfiguration configuration) : ControllerBase
 {
     
     [HttpPost("analyze")]
-    public async Task<string> FunctionHandler()
+    public async Task<IActionResult> FunctionHandler()
     {
-        var files = await githubService.GetRepositoryFilesAsync();
+        var repoService = ARepository.Create(Repositories.Repositories.GitHub, configuration);
+        var loggingService = LoggingFacade.GetInstance(LoggingConnections.MixPanel, configuration);
+        var files = await repoService.GetRepositoryFilesAsync();
 
-        var logs = await mixpanelService.RetrieveLogs(new MonitoringControllerService.DateRange
-        {
-            StartDate = DateTime.Now.AddDays(-1),
-            EndDate = DateTime.Now,
-            EventName = "Info"
-        });
+        var logs = await loggingService.RetrieveLogsAsync(DateTime.Now.AddDays(-1), DateTime.Now, "Info");
         
         var result = await AnalyzeCodeAndLogs(files, JsonSerializer.Serialize(logs));
 
-        var github = ARepository.Create(Repositories.Repositories.GitHub, configuration);
+        var workspaceRepository = ARepository.Create(Repositories.Repositories.GitHub, configuration);
         var branchName = $"Ai-Analysis-{DateTime.Now:yyyyMMdd-HHmmss}";
-        var branchResponse = await github.CreateBranch(branchName);
-        var fileChanges = new Dictionary<string, List<(int Line, string Change)>>();
+        var branchResponse = await workspaceRepository.CreateBranch(branchName);
+        var fileChanges = new Dictionary<string, List<string>>();
         foreach (var analysisResult in result)
         {
             if (!analysisResult.IsSuccess)
@@ -41,19 +38,34 @@ public class OpenAiController(GithubService githubService, MixpanelService mixpa
             }
 
             var filePath = analysisResult.FilePath;
-            var changes = new List<(int Line, string Change)>
+            var changes = new List<string>
             {
-                (0, analysisResult.Before),
-                (0, analysisResult.After)
+                analysisResult.Before,
+                analysisResult.After
             };
 
             fileChanges[filePath] = changes;
         }
+        try
+        {
+            var commitResponse = await workspaceRepository.CommitChanges(fileChanges, "AI Analysis", branchName);
+            if (commitResponse.StatusCode != 0)
+            {
+                return BadRequest($"Failed to commit changes: {commitResponse.Message}");
+            }
 
-        var commitResponse = await github.CommitChanges(fileChanges, "AI Analysis", branchName);
-        var pullRequestResponse = await github.CreatePullRequest(branchName, "main", BuildPullRequestBody(result));
+            var pullRequestResponse = await workspaceRepository.CreatePullRequest(branchName, "main", BuildPullRequestBody(result));
+            if (pullRequestResponse.StatusCode != 0)
+            {
+                return BadRequest($"Failed to create pull request: {pullRequestResponse.Message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"An error occurred while processing: {ex.Message}");
+        }
         
-        return "All Good Here!";
+        return Ok("All Good Here!");
     }
 
     private string BuildPullRequestBody(List<ResultOpenAi> results)

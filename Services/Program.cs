@@ -24,8 +24,6 @@ builder.Services.AddCors(
             });
     });
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-builder.Services.AddSingleton<GithubService>();
-builder.Services.AddSingleton<MixpanelService>();
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Services.AddControllers();

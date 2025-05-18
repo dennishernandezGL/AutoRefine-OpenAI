@@ -66,18 +66,18 @@ namespace Services.Logging.MixPanel
             }
         }
 
-        public override async Task<IEnumerable<dynamic>> RetrieveMixPanelLogsAsync(DateTime startDate, DateTime endDate, string eventName)
+        public override async Task<IEnumerable<dynamic>> RetrieveLogsAsync(DateTime startDate, DateTime endDate, string eventName)
         {
-            return await RetrieveLogsAsync(startDate, endDate, eventName);
+            return await RetrieveLogsLoggingAsync(startDate, endDate, eventName);
         }
 
         public override async Task<IEnumerable<dynamic>> RetrieveLogsByContextAsync(Func<Context, bool> contextComparison, DateTime startDate, DateTime endDate, string eventName)
         {
-            var logs = await RetrieveLogsAsync(startDate, endDate, eventName);
+            var logs = await RetrieveLogsLoggingAsync(startDate, endDate, eventName);
             return logs.Where(log => contextComparison(log));
         }
 
-        private async Task<IEnumerable<dynamic>> RetrieveLogsAsync(DateTime startDate, DateTime endDate, string eventName)
+        private async Task<IEnumerable<dynamic>> RetrieveLogsLoggingAsync(DateTime startDate, DateTime endDate, string eventName)
         {        
             var responseContent = await GetLogsUsingExport(startDate, endDate, eventName);
             var lines = responseContent.Split('\n', StringSplitOptions.RemoveEmptyEntries);
