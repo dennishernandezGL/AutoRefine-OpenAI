@@ -30,7 +30,7 @@ namespace UTests
                 .Build();
 
             _controller = new LogControllerService(configuration);
-            _monitoringController = new MonitoringControllerService(configuration);
+            _monitoringController = new MonitoringControllerService(configuration, null);
             _ingestController = new IngestController(configuration);
             _repositoryConnections = new RepositoryConnections(configuration);
         }

@@ -4,11 +4,11 @@ using Services.Services;
 
 namespace Services.Helpers;
 
-public class PlaywrightService
+public class MixpanelService
 {
     private readonly IConfiguration _configuration;
     
-    public PlaywrightService(IConfiguration configuration)
+    public MixpanelService(IConfiguration configuration)
     {
         _configuration = configuration;
     }

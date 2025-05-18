@@ -10,8 +10,6 @@
 
   <ItemGroup>
     <Compile Include="IntegrationTests.cs" />
-    <Compile Include="PlaywrightTests.cs" />
-    <Compile Include="TestOpenAiFunction.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
@@ -33,7 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../AutoRefineOpenAI/AutoRefineOpenAI/AutoRefineOpenAI.csproj" />
-    <ProjectReference Include="..\OpenAILambda\src\OpenAILambda\OpenAILambda.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 

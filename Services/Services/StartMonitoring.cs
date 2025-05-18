@@ -9,12 +9,12 @@ namespace Services.Services
     public class MonitoringControllerService : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly PlaywrightService _playwrightService;
+        private readonly MixpanelService _mixpanelService;
 
-        public MonitoringControllerService(IConfiguration configuration, PlaywrightService playwrightService)
+        public MonitoringControllerService(IConfiguration configuration, MixpanelService mixpanelService)
         {
             _configuration = configuration;
-            _playwrightService = playwrightService;
+            _mixpanelService = mixpanelService;
         }
 
         [HttpPost("retrieve-logs")]
@@ -25,7 +25,7 @@ namespace Services.Services
                 return BadRequest("Invalid date range provided.");
             }
 
-            var logs = await _playwrightService.RetrieveLogs(dateRange);
+            var logs = await _mixpanelService.RetrieveLogs(dateRange);
             
             if (logs == null || !logs.Any())
             {
@@ -43,7 +43,7 @@ namespace Services.Services
                 return BadRequest("Invalid date range provided.");
             }
 
-            var logs = await _playwrightService.RetrieveLogsByContext(request);
+            var logs = await _mixpanelService.RetrieveLogsByContext(request);
             
             if (logs == null || !logs.Any())
             {

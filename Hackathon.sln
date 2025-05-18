@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoRefineOpenAI", "AutoRef
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra", "Infra\Infra.csproj", "{A35BD33B-8995-4E28-8E9F-43E9175AE1CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAILambda", "OpenAILambda\src\OpenAILambda\OpenAILambda.csproj", "{45D07E1C-DE1B-40AE-87D6-D6724B8C614D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +32,6 @@ Global
 		{A35BD33B-8995-4E28-8E9F-43E9175AE1CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A35BD33B-8995-4E28-8E9F-43E9175AE1CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A35BD33B-8995-4E28-8E9F-43E9175AE1CE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45D07E1C-DE1B-40AE-87D6-D6724B8C614D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45D07E1C-DE1B-40AE-87D6-D6724B8C614D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45D07E1C-DE1B-40AE-87D6-D6724B8C614D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45D07E1C-DE1B-40AE-87D6-D6724B8C614D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
