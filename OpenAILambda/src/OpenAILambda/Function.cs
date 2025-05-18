@@ -100,16 +100,10 @@ public class Function
                 }
 
                 messages.Add(ChatMessage.CreateUserMessage(
-                    @"Please analyze the file. Return a JSON object containing:
-
+                    @"Please analyze the file. Return a valid JSON string object containing:
 ""reason"": A brief summary of why the change is suggested (e.g., bug fix, refactoring, feature enhancement).
-
 ""file_path"": Relative path of the file.
-
-""line_range"": Approximate line number range where the change occurred (e.g., ""L25-L35"").
-
 ""before"": The old file code.
-
 ""after"": The new file code."));
 
                 var apiKey = Environment.GetEnvironmentVariable("CHATGPT_API_KEY");
@@ -118,8 +112,48 @@ public class Function
 
                 if (result != null && result.Value != null && result.Value.Content.Count > 0)
                 {
-                    var analysisResult = result.Value.Content[0].Text;
-                    analysisResults.Add(analysisResult);
+                    var rawAnalysisResult = result.Value.Content[0].Text;
+
+                    try
+                    {
+                        // Remove the surrounding ```json and ``` markers to extract the JSON content
+                        var jsonStartIndex = rawAnalysisResult.IndexOf("{");
+                        var jsonEndIndex = rawAnalysisResult.LastIndexOf("}");
+                        if (jsonStartIndex >= 0 && jsonEndIndex > jsonStartIndex)
+                        {
+                            var jsonContent = rawAnalysisResult.Substring(jsonStartIndex, jsonEndIndex - jsonStartIndex + 1);
+
+                            // Preserve line breaks inside JSON values while removing unnecessary ones outside
+                            var cleanedJsonContent = new StringBuilder();
+                            bool insideString = false;
+
+                            foreach (var ch in jsonContent)
+                            {
+                                if (ch == '\"') insideString = !insideString;
+                                if (!insideString && (ch == '\n' || ch == '\r')) continue;
+                                cleanedJsonContent.Append(ch);
+                            }
+
+                            // Parse the cleaned JSON content to ensure it's valid
+                            using var document = JsonDocument.Parse(cleanedJsonContent.ToString());
+                            var analysisResult = JsonSerializer.Deserialize<dynamic>(cleanedJsonContent.ToString());
+                            analysisResults.Add(analysisResult);
+                        }
+                        else
+                        {
+                            analysisResults.Add(new
+                            {
+                                Error = "Invalid JSON format in analysis result."
+                            });
+                        }
+                    }
+                    catch (JsonException ex)
+                    {
+                        analysisResults.Add(new
+                        {
+                            Error = $"JSON parsing error: {ex.Message}"
+                        });
+                    }
                 }
             }
         }
