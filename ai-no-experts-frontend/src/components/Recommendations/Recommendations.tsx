@@ -1,11 +1,13 @@
 import { Box, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import type { Recommendation } from '../../models/log.model';
 
 const Recommendations: FunctionComponent<RecommendationsProps> = ({
     recommendations = [],
 }) => {
+  const [selectedRow, setSelectedRow] = useState<Recommendation | null>(null);
+
   return (
     <Container>
       {/* Title */}
@@ -30,6 +32,8 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
               <TableRow
                 key={recommendation.field}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                onClick={() => setSelectedRow(recommendation)}
+                selected={selectedRow?.field === recommendation.field}
               >
                 <TableCell component="th" scope="row">{recommendation.field}</TableCell>
                 <TableCell align="right">{recommendation.type}</TableCell>

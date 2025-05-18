@@ -20,11 +20,18 @@ export class LogInfoRequest {
       ) {
         this.message = message;
         this.context = {
-          componentName: context.componentName || '',
-          loggerUser: context.loggerUser || '',
-          environment: context.environment || '',
-          instanceIdentifier: context.instanceIdentifier || '',
+          componentName: this.validateString(context.componentName),
+          loggerUser: this.validateString(context.loggerUser),
+          environment: this.validateString(context.environment),
+          instanceIdentifier: this.validateString(context.instanceIdentifier),
         };
         this.object = JSON.stringify(data);
+      }
+
+      private validateString(value?: string): string {
+        if (value === null || value === undefined) {
+          return '';
+        }
+        return value;
       }
 }

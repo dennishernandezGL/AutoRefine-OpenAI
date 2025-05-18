@@ -1,6 +1,7 @@
 import { FormControl, InputAdornment, TextField } from '@mui/material';
 import { Field, ErrorMessage } from 'formik';
 import { type FunctionComponent } from 'react';
+import React from 'react';
 
 const FormField: FunctionComponent<FormFieldProps> = ({
     endAdornment,    
@@ -23,8 +24,8 @@ const FormField: FunctionComponent<FormFieldProps> = ({
                 type={type}
                 error={error}
                 InputProps={{
-                    startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    startAdornment: startAdornment ? <InputAdornment position="start">{React.isValidElement(startAdornment) ? startAdornment : React.createElement('span', {dangerouslySetInnerHTML: {__html: startAdornment}})}</InputAdornment> : null,
+                    endAdornment: endAdornment ? <InputAdornment position="end">{React.isValidElement(endAdornment) ? endAdornment : React.createElement('span', {dangerouslySetInnerHTML: {__html: endAdornment}})}</InputAdornment> : null,
                 }}
                 {...props}
             />
@@ -34,12 +35,12 @@ const FormField: FunctionComponent<FormFieldProps> = ({
 }
 
 type FormFieldProps = {
-    endAdornment?: string;
+    endAdornment?: React.ReactNode;
     error?: boolean;
     fullWidth?: boolean,
     label: string;
     name: string;
-    startAdornment?: string;
+    startAdornment?: React.ReactNode;
     type?: string;
     [key: string]: any;
 }

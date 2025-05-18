@@ -1,12 +1,12 @@
 export type Payment = {
     billingAddress: string;
     billingAddress2: string;
-    cardNumber: string;
+    cardHash: string; // Use hashed value instead of raw card number
     country: string;
-    cvv: string;
+    cvvHash: string; // Use hashed value instead of raw cvv
     email: string;
     expirationDate: string;
     fullName: string;
     phone: string;
-    ssn: string;
+    ssnHash: string; // Use hashed value instead of raw ssn
 }

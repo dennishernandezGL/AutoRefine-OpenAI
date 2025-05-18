@@ -34,8 +34,8 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
     cvv: Yup.string().required('CVV is required'),
     billingAddress: Yup.string().required('Billing Address is required'),
     billingAddress2: Yup.string(),
-    ssn: Yup.string(),
-    phone: Yup.string(),
+    ssn: Yup.string().matches(/^\d{3}-\d{2}-\d{4}$/,"Invalid SSN format"),
+    phone: Yup.string().matches(/^\(\d{3}\) \d{3}-\d{4}$/,"Phone number is not valid"),
     country: Yup.string(),
   });
 
@@ -49,7 +49,10 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values: any) => onSubmit(values)}
+        onSubmit={(values: any) => {
+          console.log('Form submit attempt:', values);
+          onSubmit(values);
+        }}
       >
         {({ errors, touched, resetForm }) => (
           <Form>
