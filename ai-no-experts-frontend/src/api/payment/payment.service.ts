@@ -9,14 +9,14 @@ export const submitPayment = async (data: Payment) => {
       'Logging payment form user action',
       {
         componentName: 'PaymentForm',
-        loggerUser: '',
-        environment: '',
-        instanceIdentifier: ''
+        loggerUser: 'user123', // Example hardcoded value; should be dynamic
+        environment: 'production', // Example environment setting
+        instanceIdentifier: 'instance123' // Example ID; should be unique
       },
       data
     );
     
-    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
+    const response = await axios.post('https://localhost:5050/api/log/LogInfo', logInfoRequest);
   
     return {
       statusCode: response.status,

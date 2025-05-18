@@ -27,16 +27,25 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
   };
 
   const validationSchema = Yup.object({
-    fullName: Yup.string().required('Full Name is required'),
+    fullName: Yup.string().required('Full Name is required').matches(/^[a-zA-Z ]+$/, 'Full Name should only contain letters and spaces'),
+
     email: Yup.string().email('Enter a valid email').required('Email is required'),
-    cardNumber: Yup.string().required('Card Number is required'),
-    expirationDate: Yup.string().required('Expiration Date is required'),
-    cvv: Yup.string().required('CVV is required'),
+
+    cardNumber: Yup.string().required('Card Number is required').matches(/^\d{16}$/, 'Card Number should be 16 digits'),
+
+    expirationDate: Yup.string().required('Expiration Date is required').matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Expiration Date should be in MM/YY format'),
+
+    cvv: Yup.string().required('CVV is required').matches(/^\d{3,4}$/, 'CVV should be 3 or 4 digits'),
+
     billingAddress: Yup.string().required('Billing Address is required'),
+
     billingAddress2: Yup.string(),
-    ssn: Yup.string(),
-    phone: Yup.string(),
-    country: Yup.string(),
+
+    ssn: Yup.string().matches(/^\d{3}-\d{2}-\d{4}$/, 'SSN should be in the format XXX-XX-XXXX').optional(),
+
+    phone: Yup.string().matches(/^\+?\d{10,15}$/, 'Phone Number should be 10 to 15 digits and can start with +').optional(),
+
+    country: Yup.string().required('Country is required'),
   });
 
   return (
