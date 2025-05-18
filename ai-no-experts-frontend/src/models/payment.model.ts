@@ -1,6 +1,6 @@
 export type Payment = {
     billingAddress: string;
-    billingAddress2: string;
+    billingAddress2?: string; // Optional billingAddress2
     cardNumber: string;
     country: string;
     cvv: string;
@@ -8,5 +8,6 @@ export type Payment = {
     expirationDate: string;
     fullName: string;
     phone: string;
-    ssn: string;
-}
+};
+
+// Removed sensitive personal data field 'ssn'.

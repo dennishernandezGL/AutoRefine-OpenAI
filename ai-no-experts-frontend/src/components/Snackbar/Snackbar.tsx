@@ -16,10 +16,12 @@ const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
     setIsOpen(open);
   }, [open]);
 
-  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setIsOpen(false);
-    onClose();
+    if (onClose) { 
+      onClose(); 
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 import { FormControl, InputAdornment, TextField } from '@mui/material';
 import { Field, ErrorMessage } from 'formik';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useMemo } from 'react';
 
 const FormField: FunctionComponent<FormFieldProps> = ({
     endAdornment,    
@@ -12,19 +12,23 @@ const FormField: FunctionComponent<FormFieldProps> = ({
     error = false,
     ...props
 }) => {
+    // useMemo hook to avoid unnecessary recomputation of InputAdornments
+    const startAdornmentComponent = useMemo(() => startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null, [startAdornment]);
+    const endAdornmentComponent = useMemo(() => endAdornment ? <InputAdornment position="end">{endAdornment}</InputAdornment> : null, [endAdornment]);
+
     return (
-        <FormControl fullWidth margin="normal">
+        <FormControl fullWidth={fullWidth} margin="normal">
             <Field
                 as={TextField}
-                fullWidth
+                fullWidth={fullWidth}
                 id={name}
                 name={name}
                 label={label}
                 type={type}
                 error={error}
                 InputProps={{
-                    startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    startAdornment: startAdornmentComponent,
+                    endAdornment: endAdornmentComponent,
                 }}
                 {...props}
             />

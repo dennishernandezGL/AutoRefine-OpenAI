@@ -10,13 +10,13 @@ export const submitPayment = async (data: Payment) => {
       {
         componentName: 'PaymentForm',
         loggerUser: '',
-        environment: '',
-        instanceIdentifier: ''
+        environment: process.env.NODE_ENV || 'development',
+        instanceIdentifier: generateInstanceIdentifier() // replace with an actual implementation
       },
       data
     );
     
-    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
+    const response = await axios.post('/api/log/LogInfo', logInfoRequest);
   
     return {
       statusCode: response.status,
@@ -31,3 +31,8 @@ export const submitPayment = async (data: Payment) => {
     };
   }  
 };
+
+function generateInstanceIdentifier() {
+  // Implement this function to return a unique identifier for the instance
+  return "some-unique-identifier";
+}

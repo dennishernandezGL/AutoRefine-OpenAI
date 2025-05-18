@@ -29,14 +29,22 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
   const validationSchema = Yup.object({
     fullName: Yup.string().required('Full Name is required'),
     email: Yup.string().email('Enter a valid email').required('Email is required'),
-    cardNumber: Yup.string().required('Card Number is required'),
-    expirationDate: Yup.string().required('Expiration Date is required'),
-    cvv: Yup.string().required('CVV is required'),
+    cardNumber: Yup.string()
+                  .matches(/^\d{16}$/, 'Card Number must be exactly 16 digits')
+                  .required('Card Number is required'),
+    expirationDate: Yup.string()
+                  .matches(/^\d{2}\/\d{2}$/, 'Expiration Date must be in MM/YY format')
+                  .required('Expiration Date is required'),
+    cvv: Yup.string()
+            .matches(/^\d{3,4}$/, 'CVV must be 3 or 4 digits')
+            .required('CVV is required'),
     billingAddress: Yup.string().required('Billing Address is required'),
     billingAddress2: Yup.string(),
-    ssn: Yup.string(),
-    phone: Yup.string(),
-    country: Yup.string(),
+    ssn: Yup.string()
+           .matches(/^\d{3}-\d{2}-\d{4}$/, 'SSN must be in the format XXX-XX-XXXX'),
+    phone: Yup.string()
+             .matches(/^\+?\d{10,15}$/, 'Enter a valid phone number'),
+    country: Yup.string().required('Country is required')
   });
 
   return (

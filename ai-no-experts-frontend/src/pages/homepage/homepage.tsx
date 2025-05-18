@@ -1,8 +1,13 @@
 import { Box, Container, Typography } from "@mui/material";
-
+import { useEffect } from "react";
 import AutoRefinePortal from "../../features/auto-refine-portal/auto-refine-portal";
+import MixPanel from "mixpanel-browser";
 
 const Homepage = () => {
+    useEffect(() => {
+        MixPanel.track("Homepage Loaded");
+    }, []);
+
     const renderHeaderLabel = (label: string = '') => 
         <Typography component={'h1'} sx={{ fontFamily: 'Agdasima', fontSize: '50px'}}>{ label }</Typography>;
 
