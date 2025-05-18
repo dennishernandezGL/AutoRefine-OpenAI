@@ -91,7 +91,7 @@ public class OpenAiController(GithubService githubService, MixpanelService mixpa
                                             You have access to a MixPanel logs that provide how an user interacts with the form.
                                             When I provide you with a specific file, do the following:
                                             Analyze the file to identify potential issues and security vulnerabilities based on the logs.
-                                            Propose a detailed solution.
+                                            Propose a detailed solution and add if the reason is based on potential issue or security issue or based on logs.
                                             Generate the exact code snippet that needs to be replaced or added.
                         """)
                 };
