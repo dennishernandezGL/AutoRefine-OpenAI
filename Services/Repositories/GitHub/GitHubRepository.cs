@@ -32,24 +32,55 @@ public class GitHubRepository : ARepository
         };
     }
 
-    public override async Task CheckoutBranch(string branchName)
+    public override async Task<bool> CheckoutBranch(string branchName)
     {
-        using var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Add("Authorization", $"token {_gitHubConfiguration.GitHubToken}");
-        httpClient.DefaultRequestHeaders.Add("User-Agent", _gitHubConfiguration.UserAgent);
-
-        var url = $"https://api.github.com/repos/{_gitHubConfiguration.Owner}/{this._gitHubConfiguration.Repository}/git/trees/{branchName}?recursive=1";
-        var resp = await httpClient.GetAsync(url);
-        resp.EnsureSuccessStatusCode();
-
-        await using var stream = await resp.Content.ReadAsStreamAsync();
-        using var doc    = await JsonDocument.ParseAsync(stream);
-
-        foreach (var item in doc.RootElement.GetProperty("tree").EnumerateArray())
+        try
         {
-            if (item.GetProperty("type").GetString() == "blob")
+            var solutionRoot = Directory.GetParent(AppContext.BaseDirectory)?.Parent?.Parent?.Parent?.FullName 
+                                ?? throw new InvalidOperationException("Unable to determine the solution root directory.");
+            var targetDirectory = Path.Combine(solutionRoot, $"DownloadedFiles-{DateTime.Now:yyyyMMddHHmmss}", branchName);
+            Directory.CreateDirectory(targetDirectory);
+
+            var branchContents = await _gitHubClient.Repository.Content.GetAllContentsByRef(
+                _gitHubConfiguration.Owner,
+                _gitHubConfiguration.Repository,
+                "/",
+                branchName);
+
+            await DownloadFilesRecursivelyAsync(branchContents, targetDirectory);
+            
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error while checking out branch: {ex.Message}");
+            throw;
+        }
+    }
+
+    private async Task DownloadFilesRecursivelyAsync(IReadOnlyList<RepositoryContent> contents, string targetDirectory)
+    {
+        foreach (var content in contents)
+        {
+            var targetPath = Path.Combine(targetDirectory, content.Name);
+
+            if (content.Type == ContentType.Dir)
             {
-                Console.WriteLine(item.GetProperty("path").GetString());
+                Directory.CreateDirectory(targetPath);
+                var directoryContents = await _gitHubClient.Repository.Content.GetAllContentsByRef(
+                    _gitHubConfiguration.Owner, 
+                    _gitHubConfiguration.Repository, 
+                    content.Path,
+                    content.GitUrl.Split('/').Last());
+                await DownloadFilesRecursivelyAsync(directoryContents, targetPath);
+            }
+            else if (content.Type == ContentType.File)
+            {
+                var fileContent = await _gitHubClient.Repository.Content.GetRawContent(
+                    _gitHubConfiguration.Owner, 
+                    _gitHubConfiguration.Repository, 
+                    content.Path);
+                await File.WriteAllBytesAsync(targetPath, fileContent);
             }
         }
     }

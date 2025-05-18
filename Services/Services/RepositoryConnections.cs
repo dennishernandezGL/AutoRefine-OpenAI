@@ -77,12 +77,31 @@ public class RepositoryConnections : ControllerBase
         }
     }
 
+    [HttpPost("checkout-branch")]
+    public async Task<IActionResult> CheckoutBranch([FromBody] string branchName)
+    {
+        try
+        {
+            var checkoutResponse = await ARepository.Create(Repositories.Repositories.GitHub, _configuration).CheckoutBranch(branchName);
+            if (!checkoutResponse)
+            {
+                return BadRequest("Failed to checkout branch.");
+            }
+
+            return Ok("Branch checked out successfully.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
 public class CreateCommitRequest
-{
-    public required List<FileChange> FileChanges { get; set; }
-    public required string CommitDescription { get; set; }
-    public required string BranchName { get; set; }
-}
+    {
+        public required List<FileChange> FileChanges { get; set; }
+        public required string CommitDescription { get; set; }
+        public required string BranchName { get; set; }
+    }
 
 public class FileChange
 {

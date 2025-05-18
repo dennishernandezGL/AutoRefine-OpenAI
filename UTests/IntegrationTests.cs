@@ -158,5 +158,20 @@ namespace UTests
             Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(((OkObjectResult)result).Value);
         }
+
+
+
+        [Fact]
+        public async Task DownloadCode_ShouldReturnOkResult()
+        {
+            // Arrange
+
+            // Act
+            var result = await _repositoryConnections.CheckoutBranch("Ai-Analysis-20250518-083505") as OkObjectResult;
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            Assert.NotNull(((OkObjectResult)result).Value);
+        }
     }
 }

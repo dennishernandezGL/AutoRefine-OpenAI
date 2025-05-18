@@ -41,7 +41,7 @@ public class MixpanelService
     public async Task<IEnumerable<dynamic>>  RetrieveLogs([FromBody] MonitoringControllerService.DateRange dateRange)
     {
         var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration);
-        var logs = await loggingFacade.RetrieveMixPanelLogsAsync(dateRange.StartDate, dateRange.EndDate, dateRange.EventName);
+        var logs = await loggingFacade.RetrieveLogsAsync(dateRange.StartDate, dateRange.EndDate, dateRange.EventName);
 
         if (logs == null || !logs.Any())
         {
