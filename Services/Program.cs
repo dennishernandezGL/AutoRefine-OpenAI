@@ -5,7 +5,7 @@ using Services.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from .env file
-Env.Load(".env");
+Env.Load("../.env");
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -48,5 +48,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Urls.Add("http://*:80");
+//app.Urls.Add("http://*:80");
 app.Run();

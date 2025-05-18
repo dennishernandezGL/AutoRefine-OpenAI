@@ -9,6 +9,7 @@ namespace Services.Services;
 [ApiController]
 public class OpenAiController(GithubService githubService) : ControllerBase
 {
+    [HttpPost("analyze")]
     public async Task<string> FunctionHandler()
     {
         var files = await githubService.GetRepositoryFilesAsync();
