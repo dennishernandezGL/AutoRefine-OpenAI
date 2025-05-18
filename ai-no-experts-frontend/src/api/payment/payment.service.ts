@@ -16,7 +16,7 @@ export const submitPayment = async (data: Payment) => {
       data
     );
     
-    const response = await axios.post('/api/LogControllerService/LogInfo', logInfoRequest);
+    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
   
     return {
       statusCode: response.status,
