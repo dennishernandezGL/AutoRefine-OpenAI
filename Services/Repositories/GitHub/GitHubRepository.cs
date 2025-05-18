@@ -29,7 +29,6 @@ public class GitHubRepository : ARepository
         httpClient.DefaultRequestHeaders.Add("Authorization", $"token {_gitHubConfiguration.GitHubToken}");
         httpClient.DefaultRequestHeaders.Add("User-Agent", _gitHubConfiguration.UserAgent);
 
-        // Parámetro recursive=1 para traer todo el árbol
         var url = $"https://api.github.com/repos/{_gitHubConfiguration.Owner}/{this._gitHubConfiguration.Repository}/git/trees/{branchName}?recursive=1";
         var resp = await httpClient.GetAsync(url);
         resp.EnsureSuccessStatusCode();
