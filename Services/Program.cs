@@ -1,16 +1,20 @@
 using Autofac.Extensions.DependencyInjection;
 using DotNetEnv;
+using Services.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from .env file
 Env.Load(".env");
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-// Add Autofac as the DI container
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Services.AddSingleton<GithubService>()
+    ;
 /*builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     // Register services with Autofac
@@ -37,6 +41,9 @@ if (app.Environment.IsDevelopment())
     //app.UseSwaggerUI();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
+app.MapControllers();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
