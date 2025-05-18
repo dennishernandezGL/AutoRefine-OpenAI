@@ -14,7 +14,8 @@ public abstract class ARepository
                 throw new NotImplementedException($"Repository {repo} is not implemented.");
         }
     }
-
+    
+    public abstract Task CheckoutBranch(string branchName);
     public abstract Task<RepositoryResponse> CreateBranch(string NewBranchName);
     public abstract Task<RepositoryResponse> CreatePullRequest(string BranchName, string BaseBranch, string Body);
     public abstract Task<RepositoryResponse> CommitChanges(Dictionary<string, List<(int Line, string Change)>> fileChanges, string commitMessage, string branchName);
