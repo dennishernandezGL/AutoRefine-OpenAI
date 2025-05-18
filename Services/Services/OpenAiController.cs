@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI.Chat;
+using Services.Helpers;
 using Services.Models;
 using Services.Repositories;
 
@@ -7,48 +9,23 @@ namespace Services.Services;
 
 [Route("api/[controller]")]
 [ApiController]
-public class OpenAiController(GithubService githubService) : ControllerBase
+public class OpenAiController(GithubService githubService, PlaywrightService playwrightService) : ControllerBase
 {
+    
     [HttpPost("analyze")]
     public async Task<string> FunctionHandler()
     {
         var files = await githubService.GetRepositoryFilesAsync();
 
-        var result = await AnalyzeCodeAndLogs(files, await System.IO.File.ReadAllTextAsync("logs.json"));
-        
-        /*
-        var mixPanelUrl = "https://api.mixpanel.com/engage/";
-
-        using var httpClient = new HttpClient();
-        httpClient.BaseAddress = new Uri(mixPanelUrl);
-        var mixpanelResponse = await httpClient.PostAsync("api/retrieve-logs", new StringContent(JsonSerializer.Serialize(new
+        var logs = await playwrightService.RetrieveLogs(new MonitoringControllerService.DateRange
         {
-            startDate = DateTime.Now,
-            endDate = DateTime.Now.AddDays(1),
-            eventName = "event_name",
-        })));
-
-        if (!mixpanelResponse.IsSuccessStatusCode)
-        {
-            context.Logger.LogLine($"Error retrieving logs: {mixpanelResponse.ReasonPhrase}");
-            return "Error retrieving logs";
-        }
-
-        var logs = JsonSerializer.Deserialize<dynamic>(await mixpanelResponse.Content.ReadAsStringAsync());
-
-        var prompt = "Suggest improvement or actions to take based on the following mixpanel logs." +
-                     $" {logs}" +
-                     " The action needs to be concise. For example: change regex, remove field, add hint.";
-
-        var d = new OpenAIClient("");
-        var f =d.GetOpenAIFileClient();
-        var ms = ChatMessage.CreateUserMessage("");
-        var client = new ChatClient(model: "gpt-4o", apiKey: "");
-
-        var completion = await client.CompleteChatAsync(prompt);*/
+            StartDate = DateTime.Now.AddDays(-1),
+            EndDate = DateTime.Now,
+            EventName = "event_name"
+        });
         
-        //do something
-        
+        var result = await AnalyzeCodeAndLogs(files, JsonSerializer.Serialize(logs));
+
         return "All Good Here!";
     }
     

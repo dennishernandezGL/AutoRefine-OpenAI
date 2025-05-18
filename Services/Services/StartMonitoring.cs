@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Services.Helpers;
 using Services.Logging;
 
 namespace Services.Services
@@ -8,10 +9,12 @@ namespace Services.Services
     public class MonitoringControllerService : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly PlaywrightService _playwrightService;
 
-        public MonitoringControllerService(IConfiguration configuration)
+        public MonitoringControllerService(IConfiguration configuration, PlaywrightService playwrightService)
         {
             _configuration = configuration;
+            _playwrightService = playwrightService;
         }
 
         [HttpPost("retrieve-logs")]
@@ -22,9 +25,8 @@ namespace Services.Services
                 return BadRequest("Invalid date range provided.");
             }
 
-            var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration);
-            var logs = await loggingFacade.RetrieveMixPanelLogsAsync(dateRange.StartDate, dateRange.EndDate, dateRange.EventName);
-
+            var logs = await _playwrightService.RetrieveLogs(dateRange);
+            
             if (logs == null || !logs.Any())
             {
                 return NotFound("No logs found for the specified date range.");
@@ -41,16 +43,8 @@ namespace Services.Services
                 return BadRequest("Invalid date range provided.");
             }
 
-            var loggingFacade = LoggingFacade.GetInstance(LoggingConnections.MixPanel, _configuration);
-            var logs = await loggingFacade.RetrieveLogsByContextAsync(
-                log => request.Context.ComponentName == log.ComponentName &&
-                       request.Context.Environment == log.Environment &&
-                       request.Context.InstanceIdentifier == log.InstanceIdentifier &&
-                       request.Context.LoggerUser == log.LoggerUser,
-                request.DateRange.StartDate,
-                request.DateRange.EndDate,
-                request.EventName);
-
+            var logs = await _playwrightService.RetrieveLogsByContext(request);
+            
             if (logs == null || !logs.Any())
             {
                 return NotFound("No logs found for the specified date range.");
