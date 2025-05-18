@@ -1,11 +1,18 @@
 import { Box, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { type FunctionComponent } from 'react';
+import React, { useMemo } from 'react';
 
 import type { Recommendation } from '../../models/log.model';
 
 const Recommendations: FunctionComponent<RecommendationsProps> = ({
     recommendations = [],
 }) => {
+  
+  const validRecommendations = useMemo(() => 
+    recommendations.filter(recommendation => recommendation.field && recommendation.type && recommendation.justification), 
+    [recommendations]
+  );
+  
   return (
     <Container>
       {/* Title */}
@@ -26,7 +33,7 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
           </TableHead>
           {/* Body */}
           <TableBody>
-            {recommendations.map((recommendation: Recommendation) => (
+            {validRecommendations.map((recommendation: Recommendation) => (
               <TableRow
                 key={recommendation.field}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -48,3 +55,4 @@ interface RecommendationsProps {
 }
 
 export default Recommendations;
+

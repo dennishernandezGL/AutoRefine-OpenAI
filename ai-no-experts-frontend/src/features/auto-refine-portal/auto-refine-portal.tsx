@@ -24,7 +24,11 @@ const AutoRefinePortal = () => {
             const response = await submitPayment(values);
             
             if (response.statusCode === 200) {
-                setSuccessMessage(response.data);
+                if (response.data?.message) {
+                    setSuccessMessage(response.data.message);
+                } else {
+                    setSuccessMessage("Payment processed successfully.");
+                }
             } else {
                 const errors = response.data?.errors;
                 if (errors) {
