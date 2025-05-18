@@ -9,14 +9,15 @@ export const submitPayment = async (data: Payment) => {
       'Logging payment form user action',
       {
         componentName: 'PaymentForm',
-        loggerUser: '',
-        environment: '',
-        instanceIdentifier: ''
+        loggerUser: process.env.USER || 'unknown',
+        environment: process.env.NODE_ENV || 'development',
+        instanceIdentifier: process.env.INSTANCE_ID || 'local'
       },
       data
     );
     
-    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
+    // Ensure usage of HTTPS for secure logging
+    const response = await axios.post('https://your-server-address/api/log/LogInfo', logInfoRequest);
   
     return {
       statusCode: response.status,

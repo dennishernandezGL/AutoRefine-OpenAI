@@ -1,6 +1,16 @@
 import { Box, Container, Typography } from "@mui/material";
+import { styled } from '@mui/system';
 
 import AutoRefinePortal from "../../features/auto-refine-portal/auto-refine-portal";
+
+const LogoBox = styled(Box)({
+    backgroundImage: `url(src/assets/aiNoExperts-logo.png)`,
+    backgroundSize: '100% 100%',
+    height: '200px',
+    marginRight: '30px',
+    width: '200px',
+    ariaLabel: 'Team logo'
+});
 
 const Homepage = () => {
     const renderHeaderLabel = (label: string = '') => 
@@ -13,24 +23,19 @@ const Homepage = () => {
                 alignItems: 'center',
                 display: 'flex',
                 justifyContent: 'center',
+                ariaLabel: 'Header Section'
             }}> 
                 {/* Team Logo */}
-                <Box sx={{
-                    backgroundImage: `url(src/assets/aiNoExperts-logo.png)`,
-                    backgroundSize: '100% 100%',
-                    height: '200px',
-                    marginRight: '30px',
-                    width: '200px',
-                }} />
+                <LogoBox />
                 {/* Team Information */}
-                <Box>
+                <Box sx={{ ariaLabel: 'Team Information' }}>
                     { renderHeaderLabel('GorillaLogic - AI Hackaton') }                
                     { renderHeaderLabel('AiNoExperts') }
                 </Box>                                
             </Box>
 
             {/* Auto Refine Portal */}
-            <Box sx={{ marginTop: '50px' }}>
+            <Box sx={{ marginTop: '50px', ariaLabel: 'Auto Refine Portal' }}>
                 <AutoRefinePortal />
             </Box>            
         </Container>

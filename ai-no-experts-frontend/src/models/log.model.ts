@@ -1,5 +1,1 @@
-export type Recommendation = {
-    field: string;
-    justification: string;
-    type: string;
-}
+export type Recommendation = { field: string; justification: string; type: string; /* Add any additional expected field here */ }
