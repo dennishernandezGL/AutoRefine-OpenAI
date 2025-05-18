@@ -29,14 +29,14 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
   const validationSchema = Yup.object({
     fullName: Yup.string().required('Full Name is required'),
     email: Yup.string().email('Enter a valid email').required('Email is required'),
-    cardNumber: Yup.string().required('Card Number is required'),
-    expirationDate: Yup.string().required('Expiration Date is required'),
-    cvv: Yup.string().required('CVV is required'),
+    cardNumber: Yup.string().matches(/^[0-9]{16}$/, 'Enter a valid 16-digit credit card number').required('Card Number is required'),
+    expirationDate: Yup.string().matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Enter a valid expiration date in MM/YY format').required('Expiration Date is required'),
+    cvv: Yup.string().matches(/^[0-9]{3,4}$/, 'Enter a valid CVV').required('CVV is required'),
     billingAddress: Yup.string().required('Billing Address is required'),
     billingAddress2: Yup.string(),
-    ssn: Yup.string(),
-    phone: Yup.string(),
-    country: Yup.string(),
+    ssn: Yup.string().matches(/^\d{3}-\d{2}-\d{4}$/, 'Enter a valid SSN in the format XXX-XX-XXXX'),
+    phone: Yup.string().matches(/^(\+\d{1,2}[- ]?)?\d{10}$/, 'Enter a valid phone number'),
+    country: Yup.string().required('Country is required'),
   });
 
   return (
@@ -49,7 +49,15 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values: any) => onSubmit(values)}
+        onSubmit={(values: any) => {
+          const maskedValues = {
+            ...values,
+            cardNumber: values.cardNumber.replace(/.(?=.{4})/g, '*'), // Mask all but last 4 digits
+            cvv: '*'.repeat(values.cvv.length), // Mask full CVV
+            ssn: values.ssn ? values.ssn.replace(/.(?=.{4})/g, '*') : '', // Mask all but last 4 digits
+          };
+          onSubmit(maskedValues);
+        }}
       >
         {({ errors, touched, resetForm }) => (
           <Form>

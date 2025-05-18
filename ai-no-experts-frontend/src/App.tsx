@@ -1,19 +1,20 @@
-import { BrowserRouter } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import AppRoutes from './routes';
 
-import './scss/main.scss'
+import './scss/main.scss';
 
 function App() {
   return (
-    <>
+    <React.Fragment>
       <CssBaseline />
-      <BrowserRouter>
+      <Router>
         <AppRoutes />
-      </BrowserRouter>
-    </>
-  )
+      </Router>
+    </React.Fragment>
+  );
 }
 
-export default App
+export default App;

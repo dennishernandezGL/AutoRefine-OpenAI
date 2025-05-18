@@ -6,6 +6,12 @@ import type { Recommendation } from '../../models/log.model';
 const Recommendations: FunctionComponent<RecommendationsProps> = ({
     recommendations = [],
 }) => {
+  const sanitizedRecommendations = recommendations.map(rec => ({
+    field: sanitize(rec.field),
+    type: sanitize(rec.type),
+    justification: sanitize(rec.justification)
+  }));
+
   return (
     <Container>
       {/* Title */}
@@ -26,7 +32,7 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
           </TableHead>
           {/* Body */}
           <TableBody>
-            {recommendations.map((recommendation: Recommendation) => (
+            {sanitizedRecommendations.map((recommendation: Recommendation) => (
               <TableRow
                 key={recommendation.field}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -45,6 +51,12 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
 
 interface RecommendationsProps {
   recommendations?: Recommendation[];
+}
+
+function sanitize(input: string): string {
+  return input.replace(/[&<>'"/]/g, (char) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;', '/': '&#x2F;' }[char] || char)
+  );
 }
 
 export default Recommendations;

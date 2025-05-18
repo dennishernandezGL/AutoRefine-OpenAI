@@ -5,22 +5,25 @@ import { LogInfoRequest } from '../../models/log-info-request.model';
 
 export const submitPayment = async (data: Payment) => {
   try {
+    // Avoid logging sensitive payment data
+    const { /* Destructure or extract non-sensitive fields */ ...rest } = data;
+    
     const logInfoRequest = new LogInfoRequest(
       'Logging payment form user action',
       {
         componentName: 'PaymentForm',
         loggerUser: '',
-        environment: '',
-        instanceIdentifier: ''
+        environment: process.env.NODE_ENV || 'development',
+        instanceIdentifier: process.env.INSTANCE_ID || 'unknown'
       },
-      data
+      rest // Log only non-sensitive information
     );
     
-    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
+    const logResponse = await axios.post('/api/log/LogInfo', logInfoRequest);
   
     return {
-      statusCode: response.status,
-      data: response.data,
+      statusCode: logResponse.status,
+      data: logResponse.data,
     };
   } catch (error: any) {
     console.error('submitPayment error:', error);

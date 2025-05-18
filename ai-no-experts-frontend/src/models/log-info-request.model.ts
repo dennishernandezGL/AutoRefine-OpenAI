@@ -16,14 +16,14 @@ export class LogInfoRequest {
           environment?: string;
           instanceIdentifier?: string;
         } = {},
-        data: object = {}
+        data: Record<string, unknown> = {}
       ) {
         this.message = message;
         this.context = {
-          componentName: context.componentName || '',
-          loggerUser: context.loggerUser || '',
-          environment: context.environment || '',
-          instanceIdentifier: context.instanceIdentifier || '',
+          componentName: context.componentName?.trim() || '',
+          loggerUser: context.loggerUser?.trim() || '',
+          environment: context.environment?.trim() || '',
+          instanceIdentifier: context.instanceIdentifier?.trim() || '',
         };
         this.object = JSON.stringify(data);
       }
