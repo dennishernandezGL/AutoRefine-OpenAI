@@ -20,7 +20,7 @@ public class Function
     {
         _configuration = configuration;
     }
-    
+
     public async Task<string> FunctionHandler(string input, ILambdaContext context)
     {
         var githubService = new GithubService(_configuration);
@@ -28,10 +28,10 @@ public class Function
         var files = await githubService.GetRepositoryFilesAsync();
 
         var result = await AnalyzeCodeAndLogs(files, await File.ReadAllTextAsync("logs.json"));
-        
+
         /*
         var mixPanelUrl = "https://api.mixpanel.com/engage/";
-        
+
         using var httpClient = new HttpClient();
         httpClient.BaseAddress = new Uri(mixPanelUrl);
         var mixpanelResponse = await httpClient.PostAsync("api/retrieve-logs", new StringContent(JsonSerializer.Serialize(new
@@ -40,7 +40,7 @@ public class Function
             endDate = DateTime.Now.AddDays(1),
             eventName = "event_name",
         })));
-        
+
         if (!mixpanelResponse.IsSuccessStatusCode)
         {
             context.Logger.LogLine($"Error retrieving logs: {mixpanelResponse.ReasonPhrase}");
@@ -48,7 +48,7 @@ public class Function
         }
 
         var logs = JsonSerializer.Deserialize<dynamic>(await mixpanelResponse.Content.ReadAsStringAsync());
-        
+
         var prompt = "Suggest improvement or actions to take based on the following mixpanel logs." +
                      $" {logs}" +
                      " The action needs to be concise. For example: change regex, remove field, add hint.";
@@ -59,12 +59,12 @@ public class Function
         var client = new ChatClient(model: "gpt-4o", apiKey: "");
 
         var completion = await client.CompleteChatAsync(prompt);*/
-        
+
         //do something
-        
+
         return "All Good Here!";
     }
-    
+
     private async Task<List<dynamic>> AnalyzeCodeAndLogs(List<RepositoryFile> files, string logs)
     {
         var analysisResults = new List<dynamic>();
@@ -73,14 +73,16 @@ public class Function
         {
             foreach (var file in files)
             {
-                if (!file.Path.EndsWith(".html") && !file.Path.EndsWith(".js") && !file.Path.EndsWith(".ts") && !file.Path.EndsWith(".tsx"))
+                if (!file.Path.EndsWith(".html") && !file.Path.EndsWith(".js") && !file.Path.EndsWith(".ts") &&
+                    !file.Path.EndsWith(".tsx"))
                 {
                     continue;
                 }
 
                 var messages = new List<ChatMessage>
                 {
-                    ChatMessage.CreateSystemMessage(@"I want you to act as an expert assistant in software development and code review.
+                    ChatMessage.CreateSystemMessage(
+                        @"I want you to act as an expert assistant in software development and code review.
                     You have access to a GitHub repository and can analyze source code files in a workspace.
                     When I provide you with a specific file, do the following:
                     Analyze the file to identify potential issues and security vulnerabilities.
@@ -97,15 +99,18 @@ public class Function
                     messages.Add(ChatMessage.CreateUserMessage($"# LOGS\n```\n{trimmedLogs}\n```"));
                 }
 
-                messages.Add(ChatMessage.CreateUserMessage(@"Please analyze the file and return the entire updated file in JSON format with the following structure:
-                {
-                    'filepath': '<file_path>',
-                    'lines': [
-                        { 'lineNumber': <line_number>, 'currentValue': '<current_line_content>', 'newValue': '<new_line_content>' },
-                        ...
-                    ]
-                }
-                Ensure that each line in the 'lines' array corresponds to the actual line number in the file, and the 'currentValue' matches the original content of the line, while 'newValue' contains the updated content if any changes are suggested. If no changes are needed for a line, 'newValue' should be the same as 'currentValue'."));
+                messages.Add(ChatMessage.CreateUserMessage(
+                    @"Please analyze the file. Return a JSON object containing:
+
+""reason"": A brief summary of why the change is suggested (e.g., bug fix, refactoring, feature enhancement).
+
+""file_path"": Relative path of the file.
+
+""line_range"": Approximate line number range where the change occurred (e.g., ""L25-L35"").
+
+""before"": The old file code.
+
+""after"": The new file code."));
 
                 var apiKey = Environment.GetEnvironmentVariable("CHATGPT_API_KEY");
                 var client = new ChatClient(model: "gpt-4o", apiKey: apiKey);
