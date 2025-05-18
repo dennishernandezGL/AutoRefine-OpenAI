@@ -12,11 +12,18 @@ const FormField: FunctionComponent<FormFieldProps> = ({
     error = false,
     ...props
 }) => {
+    // Basic validation for 'name' and 'label'
+    if (!name || typeof name !== 'string') {
+        throw new Error("FormField component requires a valid 'name' property of type string.");
+    }
+    if (!label || typeof label !== 'string') {
+        throw new Error("FormField component requires a valid 'label' property of type string.");
+    }
     return (
-        <FormControl fullWidth margin="normal">
+        <FormControl fullWidth={fullWidth} margin="normal">
             <Field
                 as={TextField}
-                fullWidth
+                fullWidth={fullWidth}
                 id={name}
                 name={name}
                 label={label}
@@ -24,7 +31,7 @@ const FormField: FunctionComponent<FormFieldProps> = ({
                 error={error}
                 InputProps={{
                     startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    endAdornment: endAdornment ? <InputAdornment position="end">{endAdornment}</InputAdornment> : null,
                 }}
                 {...props}
             />
