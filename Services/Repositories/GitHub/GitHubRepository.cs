@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Octokit;
 using Services.Models;
-using Services.Repositories.GitHub;
+using System.Text.Json;
 
 namespace Services.Repositories.GitHub;
 
@@ -30,6 +30,29 @@ public class GitHubRepository : ARepository
         {
             Credentials = new Credentials(_gitHubConfiguration.GitHubToken)
         };
+    }
+
+    public override async Task CheckoutBranch(string branchName)
+    {
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"token {_gitHubConfiguration.GitHubToken}");
+        httpClient.DefaultRequestHeaders.Add("User-Agent", _gitHubConfiguration.UserAgent);
+
+        // Parámetro recursive=1 para traer todo el árbol
+        var url = $"https://api.github.com/repos/{_gitHubConfiguration.Owner}/{this._gitHubConfiguration.Repository}/git/trees/{branchName}?recursive=1";
+        var resp = await httpClient.GetAsync(url);
+        resp.EnsureSuccessStatusCode();
+
+        await using var stream = await resp.Content.ReadAsStreamAsync();
+        using var doc    = await JsonDocument.ParseAsync(stream);
+
+        foreach (var item in doc.RootElement.GetProperty("tree").EnumerateArray())
+        {
+            if (item.GetProperty("type").GetString() == "blob")
+            {
+                Console.WriteLine(item.GetProperty("path").GetString());
+            }
+        }
     }
 
     public override async Task<RepositoryResponse> CreateBranch(string newBranchName)

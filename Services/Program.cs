@@ -24,6 +24,7 @@ builder.Services.AddCors(
             });
     });
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Services.AddSingleton<PlaywrightService>();
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Services.AddControllers();
