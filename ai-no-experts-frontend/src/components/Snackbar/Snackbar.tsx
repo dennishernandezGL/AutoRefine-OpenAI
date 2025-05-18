@@ -11,6 +11,63 @@ const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
     onClose 
 }) => {
   const [isOpen, setIsOpen] = useState(open);
+  const [persistent, setPersistent] = useState(false);
+
+  useEffect(() => {
+    setIsOpen(open);
+  }, [open]);
+
+  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setIsOpen(false);
+    onClose();
+  };
+
+  const makePersistent = (_event: React.SyntheticEvent) => {
+    setPersistent(true);
+  };
+
+  return (
+    <Snackbar
+      open={isOpen}
+      autoHideDuration={persistent ? null : autoHideDuration}
+      onClose={handleClose}
+      anchorOrigin={{ vertical: verticalPosition, horizontal: horizontalPosition }}
+    >
+      <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
+        {message}
+        <button onClick={makePersistent} style={{ border: 'none', background: 'transparent', color: 'inherit', cursor: 'pointer' }}>
+          Keep Open
+        </button>
+      </Alert>
+    </Snackbar>
+  );
+};
+
+interface SnackbarComponentProps {
+    autoHideDuration?: number;
+    horizontalPosition?: SnackbarOrigin['horizontal'];
+    message?: string;
+    open: boolean;
+    severity?: 'error' | 'success' | 'info' | 'warning';
+    verticalPosition?: SnackbarOrigin['vertical'];
+    onClose: () => void;
+}
+
+export default SnackbarComponent;
+
+import { type FunctionComponent, useState, useEffect } from "react";
+
+const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
+    autoHideDuration = 6000,
+    horizontalPosition = 'center',
+    message = '', 
+    open = false, 
+    severity = 'error',
+    verticalPosition = 'bottom',
+    onClose 
+}) => {
+  const [isOpen, setIsOpen] = useState(open);
 
   useEffect(() => {
     setIsOpen(open);
