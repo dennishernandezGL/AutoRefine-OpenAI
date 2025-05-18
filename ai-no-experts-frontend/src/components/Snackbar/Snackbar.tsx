@@ -1,5 +1,5 @@
 import { Snackbar, type SnackbarOrigin, Alert } from "@mui/material";
-import { type FunctionComponent, useState, useEffect } from "react";
+import { type FunctionComponent, useState, useEffect, type SyntheticEvent } from "react";
 
 const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
     autoHideDuration = 6000,
@@ -16,10 +16,10 @@ const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
     setIsOpen(open);
   }, [open]);
 
-  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setIsOpen(false);
-    onClose();
+    onClose?.();
   };
 
   return (
@@ -43,7 +43,7 @@ interface SnackbarComponentProps {
     open: boolean;
     severity?: 'error' | 'success' | 'info' | 'warning';
     verticalPosition?: SnackbarOrigin['vertical'];
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export default SnackbarComponent;

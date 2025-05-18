@@ -13,10 +13,10 @@ const FormField: FunctionComponent<FormFieldProps> = ({
     ...props
 }) => {
     return (
-        <FormControl fullWidth margin="normal">
+        <FormControl fullWidth={fullWidth} margin="normal">
             <Field
                 as={TextField}
-                fullWidth
+                fullWidth={fullWidth}
                 id={name}
                 name={name}
                 label={label}
@@ -24,7 +24,10 @@ const FormField: FunctionComponent<FormFieldProps> = ({
                 error={error}
                 InputProps={{
                     startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    endAdornment: endAdornment ? <InputAdornment position="end">{endAdornment}</InputAdornment> : null,
+                }}
+                inputProps={{
+                    'aria-label': label || name,
                 }}
                 {...props}
             />

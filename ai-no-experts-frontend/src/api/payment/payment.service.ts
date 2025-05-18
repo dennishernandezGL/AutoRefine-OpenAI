@@ -15,16 +15,17 @@ export const submitPayment = async (data: Payment) => {
       },
       data
     );
-    
-    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
-  
+
+    const logInfoUrl = process.env.LOGGING_URL || 'http://localhost:5050/api/log/LogInfo';
+    const response = await axios.post(logInfoUrl, logInfoRequest);
+
     return {
       statusCode: response.status,
       data: response.data,
     };
   } catch (error: any) {
     console.error('submitPayment error:', error);
-    
+
     return {
       statusCode: error?.response?.status || 500,
       data: error?.response?.data || { error: 'Unknown error occurred' },

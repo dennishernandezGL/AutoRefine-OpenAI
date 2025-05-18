@@ -29,14 +29,14 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
   const validationSchema = Yup.object({
     fullName: Yup.string().required('Full Name is required'),
     email: Yup.string().email('Enter a valid email').required('Email is required'),
-    cardNumber: Yup.string().required('Card Number is required'),
-    expirationDate: Yup.string().required('Expiration Date is required'),
-    cvv: Yup.string().required('CVV is required'),
+    cardNumber: Yup.string().matches(/^\d{16}$/, 'Card Number must be 16 digits').required('Card Number is required'),
+    expirationDate: Yup.string().matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Expiration date must be in MM/YY format').required('Expiration Date is required'),
+    cvv: Yup.string().matches(/^\d{3,4}$/, 'CVV must be 3 or 4 digits').required('CVV is required'),
     billingAddress: Yup.string().required('Billing Address is required'),
     billingAddress2: Yup.string(),
-    ssn: Yup.string(),
-    phone: Yup.string(),
-    country: Yup.string(),
+    ssn: Yup.string().matches(/^\d{3}-?\d{2}-?\d{4}$/, 'SSN must be in valid format').notRequired(),
+    phone: Yup.string().matches(/^\+?\d{10,15}$/, 'Phone number must be valid').notRequired(),
+    country: Yup.string().required('Country is required'),
   });
 
   return (
@@ -49,58 +49,62 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values: any) => onSubmit(values)}
+        onSubmit={(values: any) => {
+          const { ssn, ...rest } = values;
+          // Ensure ssn is handled securely (e.g., encryption before storage)
+          onSubmit(rest);
+        }}
       >
         {({ errors, touched, resetForm }) => (
           <Form>
             <Grid container spacing={2}>
               {/* Full Name */}
-              <Grid size={12}>
+              <Grid item xs={12}>
                 <FormField name='fullName' label='Full Name' error={touched.fullName && Boolean(errors.fullName)} />
               </Grid>
 
               {/* Email */}
-              <Grid size={12}>
+              <Grid item xs={12}>
                 <FormField name='email' label='Email' error={touched.email && Boolean(errors.email)} />
               </Grid>
 
               {/* Card Number */}
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid item xs={12} md={6}>
                 <FormField name='cardNumber' label='Credit Card Number' error={touched.cardNumber && Boolean(errors.cardNumber)} />
               </Grid>
 
               {/* Expiration Date */}
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid item xs={12} md={4}>
                 <FormField name='expirationDate' label='Expiration Date (MM/YY)' error={touched.expirationDate && Boolean(errors.expirationDate)} />
               </Grid>
 
               {/* CVV */}
-              <Grid size={{ xs: 12, md: 2 }}>
+              <Grid item xs={12} md={2}>
                 <FormField name='cvv' label='CVV' error={touched.cvv && Boolean(errors.cvv)} />
               </Grid>
 
               {/* Billing Address */}
-              <Grid size={12}>
+              <Grid item xs={12}>
                 <FormField name='billingAddress' label='Billing Address' error={touched.billingAddress && Boolean(errors.billingAddress)} />
               </Grid>
 
               {/* Billing Address 2 */}
-              <Grid size={12}>
+              <Grid item xs={12}>
                 <FormField name='billingAddress2' label='Billing Address 2' error={touched.billingAddress2 && Boolean(errors.billingAddress2)} />
               </Grid>
 
               {/* SSN */}
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid item xs={12} md={4}>
                 <FormField name='ssn' label='Social Security Number' error={touched.ssn && Boolean(errors.ssn)} />
               </Grid>
 
               {/* Phone */}
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid item xs={12} md={4}>
                 <FormField name='phone' label='Phone' error={touched.phone && Boolean(errors.phone)} />
               </Grid>
 
               {/* Country */}
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid item xs={12} md={4}>
                 <FormField name='country' label='Country' error={touched.country && Boolean(errors.country)} />
               </Grid>
             </Grid>
