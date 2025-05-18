@@ -15,16 +15,14 @@ const Homepage = () => {
                 justifyContent: 'center',
             }}> 
                 {/* Team Logo */}
-                <Box sx={{
-                    backgroundImage: `url(src/assets/aiNoExperts-logo.png)`,
-                    backgroundSize: '100% 100%',
+                <Box component="img" src="src/assets/aiNoExperts-logo.png" alt="AiNoExperts Logo" sx={{
                     height: '200px',
                     marginRight: '30px',
                     width: '200px',
                 }} />
                 {/* Team Information */}
                 <Box>
-                    { renderHeaderLabel('GorillaLogic - AI Hackaton') }                
+                    { renderHeaderLabel('GorillaLogic - AI Hackathon') }                
                     { renderHeaderLabel('AiNoExperts') }
                 </Box>                                
             </Box>

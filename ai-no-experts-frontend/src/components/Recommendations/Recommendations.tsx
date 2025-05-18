@@ -26,9 +26,9 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
           </TableHead>
           {/* Body */}
           <TableBody>
-            {recommendations.map((recommendation: Recommendation) => (
+            {recommendations.map((recommendation: Recommendation, index: number) => (
               <TableRow
-                key={recommendation.field}
+                key={index}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">{recommendation.field}</TableCell>

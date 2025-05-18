@@ -22,6 +22,12 @@ const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
     onClose();
   };
 
+  useEffect(() => {
+    if (message) {
+      setIsOpen(true);
+    }
+  }, [message]);
+
   return (
     <Snackbar
       open={isOpen}

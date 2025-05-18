@@ -4,25 +4,29 @@ import { useState } from "react";
 import { submitPayment } from "../../api/payment/payment.service";
 import Loading from "../../components/Loading/Loading";
 import PaymentForm from "../../components/PaymentForm/PaymentForm";
-// import Recommendations from "../../components/Recommendations/Recommendations";
 import SnackbarComponent from "../../components/Snackbar/Snackbar";
 import type { Payment } from "../../models/payment.model";
-// import type { Recommendation } from "../../models/log.model";
 
 const AutoRefinePortal = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string>('');
 
-    // const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-
-    const onPaymentFormSubmit = async (values: Payment) => {             
+    const onPaymentFormSubmit = async (values: Payment) => {
+        if (!values.amount || isNaN(Number(values.amount))) {
+            setErrorMessage("Invalid payment amount.");
+            return;
+        }
+        if (!values.currency || typeof values.currency !== 'string') {
+            setErrorMessage("Invalid currency.");
+            return;
+        }
         try {
             setIsLoading(true);
             setErrorMessage('');
             
             const response = await submitPayment(values);
-            
+
             if (response.statusCode === 200) {
                 setSuccessMessage(response.data);
             } else {
@@ -50,20 +54,13 @@ const AutoRefinePortal = () => {
         <Container maxWidth='lg'>
             {/* Payment Form */}
             <Box>
-                <PaymentForm onSubmit={(values: any) => onPaymentFormSubmit(values)} />
+                <PaymentForm onSubmit={(values: Payment) => onPaymentFormSubmit(values)} />
             </Box>
-
-            {/* Recommendations */}
-            {/* {recommendations.length > 0 && (
-                <Box sx={{ marginTop: '50px' }}>
-                    <Recommendations recommendations={recommendations} />
-                </Box>
-            )} */}
 
             <Loading isOpen={isLoading} />
 
             {/* Success Message */}
-            <SnackbarComponent 
+            <SnackbarComponent
                 open={!!successMessage}
                 message={successMessage}
                 severity="success"
@@ -72,11 +69,11 @@ const AutoRefinePortal = () => {
             />
 
             {/* Error Message */}
-            <SnackbarComponent 
+            <SnackbarComponent
                 open={!!errorMessage}
                 message={errorMessage || ''}
                 autoHideDuration={5000}
-                onClose={() => setErrorMessage('')} 
+                onClose={() => setErrorMessage('')}
             />
         </Container>
     );
