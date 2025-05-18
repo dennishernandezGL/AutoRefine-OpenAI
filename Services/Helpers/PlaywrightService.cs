@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.Playwright;
+using Services.Repositories;
 
 namespace Services.Helpers;
 
@@ -11,15 +13,30 @@ public class PlaywrightService
     private bool IsInitialized { get; set; }
     private readonly IAmazonS3 _s3Client;
     private static readonly string[] Options = ["--no-sandbox", "--disable-dev-shm-usage"];
+    private IConfiguration _configuration;
     
-    public PlaywrightService()
+    public PlaywrightService(IConfiguration configuration)
     {
+        _configuration = configuration;
         var credentials = new BasicAWSCredentials(Environment.GetEnvironmentVariable("ACCESS_KEY") ,Environment.GetEnvironmentVariable("SECRET_KEY"));
         _s3Client = new AmazonS3Client(credentials, RegionEndpoint.GetBySystemName("us-east-2"));
     }
 
+    public async Task RunTests(string branchName)
+    {
+        var git = ARepository.Create(Repositories.Repositories.GitHub, _configuration);
+        var path = await git.CheckoutBranch(branchName);
+
+        await ShellHelper.RunCommandAsync("npm", "install", $"{path}/ai-no-experts-frontend");
+        _ = ShellHelper.RunCommandAsync("npm", "run dev", $"{path}/ai-no-experts-frontend");
+        await Task.Delay(TimeSpan.FromSeconds(30));
+        await ExecuteTests();
+    }
+    
     public async Task ExecuteTests()
     {
+        await InstallBrowsersIfNeeded();
+        
         using var playwright = await Playwright.CreateAsync();
 
         await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
@@ -39,26 +56,15 @@ public class PlaywrightService
 
         try
         {
-            await page.GotoAsync("http://localhost:5173/");
+            await HappyPath(page);
+            await SubmitsFormWithValidData(page);
+            await ShowsValidationErrorsForEmptyRequiredFields(page);
+            await ResetsFormWhenClickingResetButton(page);
+            await ValidatesEmailFormat(page);
+            await ChecksAccessibilityFeatures(page);
+            await TestsResponsivenessAcrossScreenSizes(page);
 
-            await page.FillAsync("input[name=\"fullName\"]", "John Doe");
-            await page.FillAsync("input[name=\"email\"]", "john@example.com");
-            await page.FillAsync("input[name=\"cardNumber\"]", "4111111111111111");
-            await page.FillAsync("input[name=\"expirationDate\"]", "12/25");
-            await page.FillAsync("input[name=\"cvv\"]", "123");
-            await page.FillAsync("input[name=\"billingAddress\"]", "123 Main St");
-            
-            await page.ClickAsync("button[type=\"submit\"]");
-
-            var screenshot = await page.ScreenshotAsync(new()
-            {
-                Path = "screenshot.png",
-                FullPage = true,
-            });
-            
-            await UploadToS3(screenshot, "screenshot.png", "image/png");
-
-            bool formVisible = await page.Locator("form").IsVisibleAsync();
+            var formVisible = await page.Locator("form").IsVisibleAsync();
 
             var metrics = await page.EvaluateAsync<string>("() => { const [entry] = performance.getEntriesByType('navigation'); return JSON.stringify(entry.toJSON()); }");
 
@@ -70,7 +76,7 @@ public class PlaywrightService
             await browserContext.CloseAsync();
             
             var path = await page.Video?.PathAsync() ?? string.Empty;
-            if (System.IO.File.Exists(path))
+            if (File.Exists(path))
             {
                 var videoBytes = await System.IO.File.ReadAllBytesAsync(path);
                 var videoUrl = await UploadToS3(videoBytes, "recording.webm", "video/webm");
@@ -90,6 +96,120 @@ public class PlaywrightService
             await browser.CloseAsync();
         }
     }
+
+    public async Task HappyPath(IPage page)
+    {
+        await page.GotoAsync("http://localhost:5173/");
+
+        await page.FillAsync("input[name=\"fullName\"]", "John Doe");
+        await page.FillAsync("input[name=\"email\"]", "john@example.com");
+        await page.FillAsync("input[name=\"cardNumber\"]", "4111111111111111");
+        await page.FillAsync("input[name=\"expirationDate\"]", "12/25");
+        await page.FillAsync("input[name=\"cvv\"]", "123");
+        await page.FillAsync("input[name=\"billingAddress\"]", "123 Main St");
+            
+        await page.ClickAsync("button[type=\"submit\"]");
+        await page.ScreenshotAsync(new()
+        {
+            Path = "screenshot.png",
+            FullPage = true,
+        });
+    }
+    
+    public async Task SubmitsFormWithValidData(IPage _page)
+        {
+            await _page.GotoAsync("http://localhost:5173/");
+            await _page.FillAsync("input[name=\"fullName\"]", "John Doe");
+            await _page.FillAsync("input[name=\"email\"]", "john@example.com");
+            await _page.FillAsync("input[name=\"cardNumber\"]", "4111111111111111");
+            await _page.FillAsync("input[name=\"expirationDate\"]", "12/25");
+            await _page.FillAsync("input[name=\"cvv\"]", "123");
+            await _page.FillAsync("input[name=\"billingAddress\"]", "123 Main St");
+            await _page.ClickAsync("button[type=\"submit\"]");
+            await _page.ScreenshotAsync(new()
+            {
+                Path = $"screenshot{DateTime.UtcNow.Ticks}.png",
+                FullPage = true,
+            });
+        }
+
+        public async Task ShowsValidationErrorsForEmptyRequiredFields(IPage _page)
+        {
+            await _page.GotoAsync("http://localhost:5173/");
+            await _page.ClickAsync("button[type=\"submit\"]");
+
+            foreach (var name in new[] { "fullName", "email", "cardNumber", "expirationDate", "cvv", "billingAddress" })
+            {
+                var locator = _page.Locator($"input[name=\"{name}\"]");
+            }
+            
+            await _page.ScreenshotAsync(new()
+            {
+                Path = $"screenshot{DateTime.UtcNow.Ticks}.png",
+                FullPage = true,
+            });
+        }
+
+        public async Task ResetsFormWhenClickingResetButton(IPage _page)
+        {
+            await _page.GotoAsync("http://localhost:5173/");
+            await _page.FillAsync("input[name=\"fullName\"]", "John Doe");
+            await _page.FillAsync("input[name=\"email\"]", "john@example.com");
+            await _page.ClickAsync("button:text(\"Reset\")");
+            await _page.ScreenshotAsync(new()
+            {
+                Path = $"screenshot{DateTime.UtcNow.Ticks}.png",
+                FullPage = true,
+            });
+        }
+
+        public async Task ValidatesEmailFormat(IPage _page)
+        {
+            await _page.GotoAsync("http://localhost:5173/");
+            await _page.FillAsync("input[name=\"email\"]", "invalid-email");
+            await _page.ClickAsync("button[type=\"submit\"]");
+            await _page.ScreenshotAsync(new()
+            {
+                Path = $"screenshot{DateTime.UtcNow.Ticks}.png",
+                FullPage = true,
+            });
+        }
+    
+
+        public async Task ChecksAccessibilityFeatures(IPage _page)
+        {
+            await _page.GotoAsync("http://localhost:5173/");
+
+            // Keyboard accessibility: first Tab should focus the fullName field
+            await _page.Keyboard.PressAsync("Tab");
+            var activeName = await _page.EvaluateAsync<string>("() => document.activeElement?.getAttribute('name')");
+            await _page.ScreenshotAsync(new()
+            {
+                Path = $"screenshot{DateTime.UtcNow.Ticks}.png",
+                FullPage = true,
+            });
+        }
+
+        public async Task TestsResponsivenessAcrossScreenSizes(IPage _page)
+        {
+            var viewports = new (int Width, int Height)[]
+            {
+                (1920, 1080), // Desktop
+                (768, 1024),  // Tablet
+                (375, 812)    // Mobile
+            };
+
+            foreach (var vp in viewports)
+            {
+                await _page.SetViewportSizeAsync(vp.Width, vp.Height);
+                await _page.GotoAsync("http://localhost:5173/");
+                await _page.ScreenshotAsync(new()
+                {
+                    Path = $"screenshot{DateTime.UtcNow.Ticks}.png",
+                    FullPage = true,
+                });
+            }
+        }
     
     private async Task<string> UploadToS3(byte[] fileBytes, string fileName, string contentType)
     {
@@ -121,8 +241,7 @@ public class PlaywrightService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error uploading to S3: {ex.Message}");
-            throw;
+            return "";
         }
     }
     

@@ -12,7 +12,7 @@ namespace Services.Services;
 
 [Route("api/[controller]")]
 [ApiController]
-public class OpenAiController(IConfiguration configuration) : ControllerBase
+public class OpenAiController(IConfiguration configuration, PlaywrightService playwrightService) : ControllerBase
 {
     
     [HttpPost("analyze")]
@@ -59,6 +59,8 @@ public class OpenAiController(IConfiguration configuration) : ControllerBase
             {
                 return BadRequest($"Failed to create pull request: {pullRequestResponse.Message}");
             }
+            
+            await playwrightService.RunTests(branchName);
         }
         catch (Exception ex)
         {

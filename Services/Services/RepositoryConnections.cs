@@ -83,7 +83,7 @@ public class RepositoryConnections : ControllerBase
         try
         {
             var checkoutResponse = await ARepository.Create(Repositories.Repositories.GitHub, _configuration).CheckoutBranch(branchName);
-            if (!checkoutResponse)
+            if (string.IsNullOrWhiteSpace(checkoutResponse))
             {
                 return BadRequest("Failed to checkout branch.");
             }

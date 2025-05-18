@@ -20,4 +20,11 @@ public class PlaywrightController : ControllerBase
         await _playwrightService.ExecuteTests();
         return Ok();
     }
+    
+    [HttpPost("/playwright/run/{branchName}")]
+    public async Task<IActionResult> Run(string branchName)
+    {
+        await _playwrightService.RunTests(branchName);
+        return Ok();
+    }
 }

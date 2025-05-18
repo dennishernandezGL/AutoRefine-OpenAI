@@ -15,7 +15,7 @@ public abstract class ARepository
         }
     }
     
-    public abstract Task<bool> CheckoutBranch(string branchName);
+    public abstract Task<string> CheckoutBranch(string branchName);
     public abstract Task<RepositoryResponse> CreateBranch(string NewBranchName);
     public abstract Task<RepositoryResponse> CreatePullRequest(string BranchName, string BaseBranch, string Body);
     public abstract Task<RepositoryResponse> CommitChanges(Dictionary<string, List<string>> fileChanges, string commitMessage, string branchName);

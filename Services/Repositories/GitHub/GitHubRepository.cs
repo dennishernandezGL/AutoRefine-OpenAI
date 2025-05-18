@@ -32,7 +32,7 @@ public class GitHubRepository : ARepository
         };
     }
 
-    public override async Task<bool> CheckoutBranch(string branchName)
+    public override async Task<string> CheckoutBranch(string branchName)
     {
         try
         {
@@ -47,9 +47,9 @@ public class GitHubRepository : ARepository
                 "/",
                 branchName);
 
-            await DownloadFilesRecursivelyAsync(branchContents, targetDirectory);
+            await DownloadFilesRecursivelyAsync(branchContents, targetDirectory, branchName);
             
-            return true;
+            return targetDirectory;
         }
         catch (Exception ex)
         {
@@ -58,7 +58,7 @@ public class GitHubRepository : ARepository
         }
     }
 
-    private async Task DownloadFilesRecursivelyAsync(IReadOnlyList<RepositoryContent> contents, string targetDirectory)
+    private async Task DownloadFilesRecursivelyAsync(IReadOnlyList<RepositoryContent> contents, string targetDirectory, string branchName)
     {
         foreach (var content in contents)
         {
@@ -71,15 +71,15 @@ public class GitHubRepository : ARepository
                     _gitHubConfiguration.Owner, 
                     _gitHubConfiguration.Repository, 
                     content.Path,
-                    content.GitUrl.Split('/').Last());
-                await DownloadFilesRecursivelyAsync(directoryContents, targetPath);
+                    branchName);
+                await DownloadFilesRecursivelyAsync(directoryContents, targetPath, branchName);
             }
             else if (content.Type == ContentType.File)
             {
-                var fileContent = await _gitHubClient.Repository.Content.GetRawContent(
+                var fileContent = await _gitHubClient.Repository.Content.GetRawContentByRef(
                     _gitHubConfiguration.Owner, 
                     _gitHubConfiguration.Repository, 
-                    content.Path);
+                    content.Path, branchName);
                 await File.WriteAllBytesAsync(targetPath, fileContent);
             }
         }
