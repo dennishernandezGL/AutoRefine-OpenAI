@@ -18,5 +18,6 @@ public abstract class ARepository
     public abstract Task CheckoutBranch(string branchName);
     public abstract Task<RepositoryResponse> CreateBranch(string NewBranchName);
     public abstract Task<RepositoryResponse> CreatePullRequest(string BranchName, string BaseBranch, string Body);
-    public abstract Task<RepositoryResponse> CommitChanges(Dictionary<string, List<(int Line, string Change)>> fileChanges, string commitMessage, string branchName);
+    public abstract Task<RepositoryResponse> CommitChanges(Dictionary<string, List<string>> fileChanges, string commitMessage, string branchName);
+    public abstract Task<List<Models.RepositoryFile>> GetRepositoryFilesAsync();
 }

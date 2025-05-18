@@ -61,7 +61,7 @@ public class RepositoryConnections : ControllerBase
             var commitResponse = await ARepository.Create(Repositories.Repositories.GitHub, _configuration)
                 .CommitChanges(request.FileChanges.ToDictionary(
                     change => change.FileName,
-                    change => new List<(int Line, string Change)> { (change.LineNumber, change.NewLine) }),
+                    change => new List<string> { change.Current, change.New }),
                     request.CommitDescription,
                     request.BranchName);
             if (commitResponse.StatusCode != 0)
@@ -87,8 +87,8 @@ public class CreateCommitRequest
 public class FileChange
 {
     public required string FileName { get; set; }
-    public required int LineNumber { get; set; }
-    public required string NewLine { get; set; }
+    public required string Current { get; set; }
+    public required string New { get; set; }
 }
 }
 

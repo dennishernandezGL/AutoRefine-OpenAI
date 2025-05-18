@@ -1,5 +1,8 @@
 using System;
-using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json.Serialization;
+using Octokit;
+using Services.Models;
 using System.Text.Json;
 
 namespace Services.Repositories.GitHub;
@@ -8,18 +11,24 @@ public class GitHubRepository : ARepository
 {
     private readonly IConfiguration _configuration;
     private readonly GitHubConfiguration _gitHubConfiguration;
+    private readonly GitHubClient _gitHubClient;
 
     public GitHubRepository(IConfiguration configuration)
     {
         _configuration = configuration;
 
-        this._gitHubConfiguration = new GitHubConfiguration()
+        _gitHubConfiguration = new GitHubConfiguration()
         {
             GitHubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? throw new ArgumentNullException("GITHUB_TOKEN"),
             Owner = _configuration["GitHub:Owner"] ?? throw new ArgumentNullException("GitHub:Owner"),
             Repository = _configuration["GitHub:Repository"] ?? throw new ArgumentNullException("GitHub:Repository"),
             BaseBranch = _configuration["GitHub:BaseBranch"] ?? throw new ArgumentNullException("GitHub:BaseBranch"),
             UserAgent = _configuration["GitHub:UserAgent"] ?? throw new ArgumentNullException("GitHub:UserAgent")
+        };
+        
+        _gitHubClient = new GitHubClient(new ProductHeaderValue("AutoRefineOpenAI"))
+        {
+            Credentials = new Credentials(_gitHubConfiguration.GitHubToken)
         };
     }
 
@@ -121,7 +130,7 @@ public class GitHubRepository : ARepository
         }
     }
 
-    public async override Task<RepositoryResponse> CommitChanges(Dictionary<string, List<(int Line, string Change)>> fileChanges, string commitMessage, string branchName)
+    public async override Task<RepositoryResponse> CommitChanges(Dictionary<string, List<string>> fileChanges, string commitMessage, string branchName)
     {
         try
         {
@@ -177,21 +186,8 @@ public class GitHubRepository : ARepository
                 // Decode the file content
                 var decodedContent = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(fileData.Content));
 
-                // Apply changes to the file content
-                var lines = decodedContent.Split('\n').ToList();
-                foreach (var change in fileChange.Value)
-                {
-                    //if (change.Line <= 0 || change.Line > lines.Count)
-                    if (change.Line > lines.Count)
-                    {
-                        return new RepositoryResponse { StatusCode = 400, Message = $"Invalid line number {change.Line} for file {filePath}." };
-                    }
-                    //lines[change.Line - 1] = change.Change;
-                    lines[0] = change.Change;
-                }
-
-                //var updatedContent = string.Join("\n", lines);
-                var updatedContent = fileChange.Value.Last().Change;
+                // Apply changes to the file content, last item has the new version, first item has the old version
+                var updatedContent = fileChange.Value.Last();
                 
                 // Create a blob for the updated file
                 var blobPayload = new { content = updatedContent, encoding = "utf-8" };
@@ -269,6 +265,79 @@ public class GitHubRepository : ARepository
         {
             return new RepositoryResponse { StatusCode = 500, Message = $"Internal server error: {ex.Message}" };
         }
+    }
+
+    public async override Task<List<RepositoryFile>> GetRepositoryFilesAsync()
+    {
+        List<RepositoryFile> files = new List<RepositoryFile>();
+            
+        try
+        {
+            var rootContents = await _gitHubClient.Repository.Content.GetAllContents(_gitHubConfiguration.Owner, 
+                _gitHubConfiguration.Repository, "ai-no-experts-frontend/src");
+                
+            await GetFilesRecursivelyAsync(rootContents, "ai-no-experts-frontend/src", files);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener archivos del repositorio: {ex.Message}");
+            throw;
+        }
+            
+        return files;
+    }
+    
+    private async Task GetFilesRecursivelyAsync(IReadOnlyList<RepositoryContent> contents, string path, List<RepositoryFile> files)
+    {
+        foreach (var content in contents)
+        {
+            var currentPath = Path.Combine(path, content.Name);
+                
+            if (content.Type == ContentType.Dir)
+            {
+                var directoryContents = await _gitHubClient.Repository.Content.GetAllContents(_gitHubConfiguration.Owner,
+                    _gitHubConfiguration.Repository, currentPath);
+                await GetFilesRecursivelyAsync(directoryContents, currentPath, files);
+            }
+            else if (content.Type == ContentType.File)
+            {
+                if (!ShouldAnalyzeFile(content.Name))
+                {
+                    continue;
+                }
+                
+                var fileContent = await _gitHubClient.Repository.Content.GetRawContent(_gitHubConfiguration.Owner, _gitHubConfiguration.Repository, currentPath);
+                var contentString = Encoding.UTF8.GetString(fileContent);
+                        
+                files.Add(new RepositoryFile
+                {
+                    Path = currentPath,
+                    Name = content.Name,
+                    Content = contentString
+                });
+            }
+        }
+    }
+    
+    private bool ShouldAnalyzeFile(string fileName)
+    {
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            
+        var codeExtensions = new[] { ".tsx", ".js", ".html", ".css", ".scss", ".ts", ".json", ".env" };
+            
+        return Array.Exists(codeExtensions, ext => ext == extension);
+    }
+
+    public class Links
+    {
+        [JsonPropertyName("self")]
+        public string Self { get; set; }
+
+        [JsonPropertyName("git")]
+        public string Git { get; set; }
+
+        [JsonPropertyName("html")]
+        public string Html { get; set; }
     }
     
     public class GitHubConfiguration

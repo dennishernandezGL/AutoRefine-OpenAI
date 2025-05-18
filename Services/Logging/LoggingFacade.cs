@@ -40,9 +40,9 @@ namespace Services.Logging
             throw new NotImplementedException("LogError method must be implemented by a derived class.");
         }
 
-        public virtual Task<IEnumerable<dynamic>> RetrieveMixPanelLogsAsync(DateTime startDate, DateTime endDate, string eventName)
+        public virtual Task<IEnumerable<dynamic>> RetrieveLogsAsync(DateTime startDate, DateTime endDate, string eventName)
         {
-            throw new NotImplementedException("RetrieveMixPanelLogsAsync method must be implemented by a derived class.");
+            throw new NotImplementedException("RetrieveLogsAsync method must be implemented by a derived class.");
         }
 
         public virtual Task<IEnumerable<dynamic>> RetrieveLogsByContextAsync(Func<Context, bool> contextComparison, DateTime startDate, DateTime endDate, string eventName)
