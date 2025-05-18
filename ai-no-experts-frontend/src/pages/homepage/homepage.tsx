@@ -1,10 +1,20 @@
 import { Box, Container, Typography } from "@mui/material";
+import { useMemo } from "react";
 
 import AutoRefinePortal from "../../features/auto-refine-portal/auto-refine-portal";
+import logoUrl from "src/assets/aiNoExperts-logo.png";
 
 const Homepage = () => {
     const renderHeaderLabel = (label: string = '') => 
         <Typography component={'h1'} sx={{ fontFamily: 'Agdasima', fontSize: '50px'}}>{ label }</Typography>;
+
+    const logoBackground = useMemo(() => ({
+        backgroundImage: `url(${logoUrl})`,
+        backgroundSize: '100% 100%',
+        height: '200px',
+        marginRight: '30px',
+        width: '200px',
+    }), []);
 
     return (
         <Container sx={{ color: '#000', padding: '50px 0' }}>
@@ -15,13 +25,7 @@ const Homepage = () => {
                 justifyContent: 'center',
             }}> 
                 {/* Team Logo */}
-                <Box sx={{
-                    backgroundImage: `url(src/assets/aiNoExperts-logo.png)`,
-                    backgroundSize: '100% 100%',
-                    height: '200px',
-                    marginRight: '30px',
-                    width: '200px',
-                }} />
+                <Box sx={logoBackground} />
                 {/* Team Information */}
                 <Box>
                     { renderHeaderLabel('GorillaLogic - AI Hackaton') }                

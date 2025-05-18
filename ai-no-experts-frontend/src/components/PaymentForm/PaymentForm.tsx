@@ -1,7 +1,8 @@
-import { Box, Button, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Typography, TextField } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { type FunctionComponent } from 'react';
 import * as Yup from 'yup';
+import React from 'react';
 
 import FormField from '../FormField/FormField';
 import type { Payment } from '../../models/payment.model';
@@ -29,13 +30,13 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
   const validationSchema = Yup.object({
     fullName: Yup.string().required('Full Name is required'),
     email: Yup.string().email('Enter a valid email').required('Email is required'),
-    cardNumber: Yup.string().required('Card Number is required'),
-    expirationDate: Yup.string().required('Expiration Date is required'),
-    cvv: Yup.string().required('CVV is required'),
+    cardNumber: Yup.string().matches(/^\d{16}$/, 'Must be a 16-digit card number').required('Card Number is required'),
+    expirationDate: Yup.string().matches(/^(0[1-9]|1[0-2])\/[0-9]{2}$/, 'Enter a valid expiration date MM/YY').required('Expiration Date is required'),
+    cvv: Yup.string().matches(/^\d{3,4}$/, 'Enter a valid CVV').required('CVV is required'),
     billingAddress: Yup.string().required('Billing Address is required'),
     billingAddress2: Yup.string(),
-    ssn: Yup.string(),
-    phone: Yup.string(),
+    ssn: Yup.string().matches(/^\d{3}-\d{2}-\d{4}$/, 'Enter a valid SSN format'),
+    phone: Yup.string().matches(/^\+?[1-9]\d{1,14}$/, 'Enter a valid phone number'),
     country: Yup.string(),
   });
 
@@ -66,7 +67,9 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
 
               {/* Card Number */}
               <Grid size={{ xs: 12, md: 6 }}>
-                <FormField name='cardNumber' label='Credit Card Number' error={touched.cardNumber && Boolean(errors.cardNumber)} />
+                <FormField name='cardNumber' label='Credit Card Number' error={touched.cardNumber && Boolean(errors.cardNumber)} 
+                  type='password'
+                />
               </Grid>
 
               {/* Expiration Date */}
@@ -76,7 +79,9 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
 
               {/* CVV */}
               <Grid size={{ xs: 12, md: 2 }}>
-                <FormField name='cvv' label='CVV' error={touched.cvv && Boolean(errors.cvv)} />
+                <FormField name='cvv' label='CVV' error={touched.cvv && Boolean(errors.cvv)} 
+                  type='password'
+                />
               </Grid>
 
               {/* Billing Address */}
@@ -91,7 +96,9 @@ const PaymentForm: FunctionComponent<PaymentFormProps> = ({
 
               {/* SSN */}
               <Grid size={{ xs: 12, md: 4 }}>
-                <FormField name='ssn' label='Social Security Number' error={touched.ssn && Boolean(errors.ssn)} />
+                <FormField name='ssn' label='Social Security Number' error={touched.ssn && Boolean(errors.ssn)} 
+                  type='password'
+                />
               </Grid>
 
               {/* Phone */}
