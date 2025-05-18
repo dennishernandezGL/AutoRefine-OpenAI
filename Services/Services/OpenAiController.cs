@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI.Chat;
 using Services.Helpers;
@@ -10,7 +11,8 @@ namespace Services.Services;
 
 [Route("api/[controller]")]
 [ApiController]
-public class OpenAiController(GithubService githubService, MixpanelService mixpanelService) : ControllerBase
+public class OpenAiController(GithubService githubService, MixpanelService mixpanelService,
+    IConfiguration configuration) : ControllerBase
 {
     
     [HttpPost("analyze")]
@@ -22,17 +24,54 @@ public class OpenAiController(GithubService githubService, MixpanelService mixpa
         {
             StartDate = DateTime.Now.AddDays(-1),
             EndDate = DateTime.Now,
-            EventName = "event_name"
+            EventName = "Info"
         });
         
         var result = await AnalyzeCodeAndLogs(files, JsonSerializer.Serialize(logs));
 
+        var github = ARepository.Create(Repositories.Repositories.GitHub, configuration);
+        var branchName = $"Ai-Analysis-{DateTime.Now:yyyyMMdd-HHmmss}";
+        var branchResponse = await github.CreateBranch(branchName);
+        var fileChanges = new Dictionary<string, List<(int Line, string Change)>>();
+        foreach (var analysisResult in result)
+        {
+            if (!analysisResult.IsSuccess)
+            {
+                continue;
+            }
+
+            var filePath = analysisResult.FilePath;
+            var changes = new List<(int Line, string Change)>
+            {
+                (0, analysisResult.Before),
+                (0, analysisResult.After)
+            };
+
+            fileChanges[filePath] = changes;
+        }
+
+        var commitResponse = await github.CommitChanges(fileChanges, "AI Analysis", branchName);
+        var pullRequestResponse = await github.CreatePullRequest(branchName, "main", BuildPullRequestBody(result));
+        
         return "All Good Here!";
     }
-    
-    private async Task<List<dynamic>> AnalyzeCodeAndLogs(List<RepositoryFile> files, string logs)
+
+    private string BuildPullRequestBody(List<ResultOpenAi> results)
     {
-        var analysisResults = new List<dynamic>();
+        var sb = new StringBuilder();
+        foreach (var result in results)
+        {
+            sb.AppendLine($"### File: {result.FilePath}");
+            sb.AppendLine($"**Reason:** {result.Reason}");
+            sb.AppendLine("<br><br>");
+        }
+
+        return sb.ToString();
+    }
+    
+    private async Task<List<ResultOpenAi>> AnalyzeCodeAndLogs(List<RepositoryFile> files, string logs)
+    {
+        var analysisResults = new List<ResultOpenAi>();
 
         try
         {
@@ -47,12 +86,14 @@ public class OpenAiController(GithubService githubService, MixpanelService mixpa
                 var messages = new List<ChatMessage>
                 {
                     ChatMessage.CreateSystemMessage(
-                        @"I want you to act as an expert assistant in software development and code review.
-                    You have access to a GitHub repository and can analyze source code files in a workspace.
-                    When I provide you with a specific file, do the following:
-                    Analyze the file to identify potential issues and security vulnerabilities.
-                    Propose a detailed solution.
-                    Generate the exact code snippet that needs to be replaced or added.")
+                        """
+                        I want you to act as an expert assistant in software development and code review.
+                                            You have access to a MixPanel logs that provide how an user interacts with the form.
+                                            When I provide you with a specific file, do the following:
+                                            Analyze the file to identify potential issues and security vulnerabilities based on the logs.
+                                            Propose a detailed solution.
+                                            Generate the exact code snippet that needs to be replaced or added.
+                        """)
                 };
 
                 var fileContent = $"## FILE: {file.Path}\n```\n{file.Content}\n```";
@@ -66,16 +107,16 @@ public class OpenAiController(GithubService githubService, MixpanelService mixpa
 
                 messages.Add(ChatMessage.CreateUserMessage(
                     @"Please analyze the file. Return a valid JSON string object containing:
-""reason"": A brief summary of why the change is suggested (e.g., bug fix, refactoring, feature enhancement).
-""file_path"": Relative path of the file.
-""before"": The old file code.
-""after"": The new file code."));
+                            ""reason"": A brief summary of why the change is suggested (e.g., bug fix, refactoring, feature enhancement).
+                            ""file_path"": Relative path of the file.
+                            ""before"": The old file code.
+                            ""after"": The new file code."));
 
                 var apiKey = Environment.GetEnvironmentVariable("CHATGPT_API_KEY");
                 var client = new ChatClient(model: "gpt-4o", apiKey: apiKey);
                 var result = await client.CompleteChatAsync(messages);
 
-                if (result != null && result.Value != null && result.Value.Content.Count > 0)
+                if (result is { Value: not null } && result.Value.Content.Count > 0)
                 {
                     var rawAnalysisResult = result.Value.Content[0].Text;
 
@@ -88,9 +129,8 @@ public class OpenAiController(GithubService githubService, MixpanelService mixpa
                         {
                             var jsonContent = rawAnalysisResult.Substring(jsonStartIndex, jsonEndIndex - jsonStartIndex + 1);
 
-                            // Preserve line breaks inside JSON values while removing unnecessary ones outside
                             var cleanedJsonContent = new StringBuilder();
-                            bool insideString = false;
+                            var insideString = false;
 
                             foreach (var ch in jsonContent)
                             {
@@ -99,37 +139,39 @@ public class OpenAiController(GithubService githubService, MixpanelService mixpa
                                 cleanedJsonContent.Append(ch);
                             }
 
-                            // Parse the cleaned JSON content to ensure it's valid
                             using var document = JsonDocument.Parse(cleanedJsonContent.ToString());
-                            var analysisResult = JsonSerializer.Deserialize<dynamic>(cleanedJsonContent.ToString());
+                            var analysisResult = JsonSerializer.Deserialize<ResultOpenAi>(cleanedJsonContent.ToString());
                             analysisResults.Add(analysisResult);
-                        }
-                        else
-                        {
-                            analysisResults.Add(new
-                            {
-                                Error = "Invalid JSON format in analysis result."
-                            });
                         }
                     }
                     catch (JsonException ex)
                     {
-                        analysisResults.Add(new
-                        {
-                            Error = $"JSON parsing error: {ex.Message}"
-                        });
+                        //Ignored
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            analysisResults.Add(new
-            {
-                Error = $"Error analyzing file: {ex.Message}"
-            });
+            // Ignored
         }
 
         return analysisResults;
     }
+}
+
+public class ResultOpenAi
+{
+    [JsonPropertyName("reason")]
+    public string Reason { get; set; }
+    [JsonPropertyName("file_path")]
+    public string FilePath { get; set; }
+    [JsonPropertyName("before")]
+    public string Before { get; set; }
+    [JsonPropertyName("after")]
+    public string After { get; set; }
+    [JsonIgnore]
+    public bool IsSuccess  =>
+        !string.IsNullOrEmpty(Reason) && !string.IsNullOrEmpty(FilePath) && !string.IsNullOrEmpty(Before) &&
+        !string.IsNullOrEmpty(After);
 }

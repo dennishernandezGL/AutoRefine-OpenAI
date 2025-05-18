@@ -157,15 +157,18 @@ public class GitHubRepository : ARepository
                 var lines = decodedContent.Split('\n').ToList();
                 foreach (var change in fileChange.Value)
                 {
-                    if (change.Line <= 0 || change.Line > lines.Count)
+                    //if (change.Line <= 0 || change.Line > lines.Count)
+                    if (change.Line > lines.Count)
                     {
                         return new RepositoryResponse { StatusCode = 400, Message = $"Invalid line number {change.Line} for file {filePath}." };
                     }
-                    lines[change.Line - 1] = change.Change;
+                    //lines[change.Line - 1] = change.Change;
+                    lines[0] = change.Change;
                 }
 
-                var updatedContent = string.Join("\n", lines);
-
+                //var updatedContent = string.Join("\n", lines);
+                var updatedContent = fileChange.Value.Last().Change;
+                
                 // Create a blob for the updated file
                 var blobPayload = new { content = updatedContent, encoding = "utf-8" };
                 var blobResponse = await httpClient.PostAsJsonAsync($"https://api.github.com/repos/{_gitHubConfiguration.Owner}/{_gitHubConfiguration.Repository}/git/blobs", blobPayload);
