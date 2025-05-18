@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Compile Include="IntegrationTests.cs" />
+    <Compile Include="PlaywrightTests.cs" />
     <Compile Include="TestOpenAiFunction.cs" />
   </ItemGroup>
   <ItemGroup>
