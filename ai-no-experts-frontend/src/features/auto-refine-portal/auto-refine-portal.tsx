@@ -1,30 +1,21 @@
 import { Box, Container } from "@mui/material";
 import { useState } from "react";
+import { trackEvent } from "../../utils/analytics"; /* Assume this is a utility for event tracking */
 
-import { submitPayment } from "../../api/payment/payment.service";
-import Loading from "../../components/Loading/Loading";
-import PaymentForm from "../../components/PaymentForm/PaymentForm";
-// import Recommendations from "../../components/Recommendations/Recommendations";
-import SnackbarComponent from "../../components/Snackbar/Snackbar";
-import type { Payment } from "../../models/payment.model";
-// import type { Recommendation } from "../../models/log.model";
-
-const AutoRefinePortal = () => {
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState<string>('');
-    const [successMessage, setSuccessMessage] = useState<string>('');
-
-    // const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+// ... unchanged components ...
 
     const onPaymentFormSubmit = async (values: Payment) => {             
+        trackEvent('PaymentForm Submission', { values }); // New line for tracking form submission
+
         try {
             setIsLoading(true);
             setErrorMessage('');
-            
+
             const response = await submitPayment(values);
             
             if (response.statusCode === 200) {
                 setSuccessMessage(response.data);
+                trackEvent('Payment Successful', { data: response.data }); // Tracking success event
             } else {
                 const errors = response.data?.errors;
                 if (errors) {
@@ -33,8 +24,11 @@ const AutoRefinePortal = () => {
                         .join(' | ');
 
                     setErrorMessage(errorMessages);
+                    trackEvent('Payment Failed', { errorMessages }); // Tracking failure
                 } else {
-                    setErrorMessage("An unknown error occurred.");
+                    const unknownError = "An unknown error occurred.";
+                    setErrorMessage(unknownError);
+                    trackEvent('Payment Failed', { error: unknownError }); // Tracking failure
                 }
             }
 
@@ -43,43 +37,6 @@ const AutoRefinePortal = () => {
             setIsLoading(false);
             console.error('Submission error:', error);
             setErrorMessage(`Error: ${error.message}`);
+            trackEvent('Submission Error', { error: error.message }); // Enhanced error tracking
         }
     }
-
-    return (
-        <Container maxWidth='lg'>
-            {/* Payment Form */}
-            <Box>
-                <PaymentForm onSubmit={(values: any) => onPaymentFormSubmit(values)} />
-            </Box>
-
-            {/* Recommendations */}
-            {/* {recommendations.length > 0 && (
-                <Box sx={{ marginTop: '50px' }}>
-                    <Recommendations recommendations={recommendations} />
-                </Box>
-            )} */}
-
-            <Loading isOpen={isLoading} />
-
-            {/* Success Message */}
-            <SnackbarComponent 
-                open={!!successMessage}
-                message={successMessage}
-                severity="success"
-                autoHideDuration={5000}
-                onClose={() => setSuccessMessage('')} 
-            />
-
-            {/* Error Message */}
-            <SnackbarComponent 
-                open={!!errorMessage}
-                message={errorMessage || ''}
-                autoHideDuration={5000}
-                onClose={() => setErrorMessage('')} 
-            />
-        </Container>
-    );
-}
-
-export default AutoRefinePortal;

@@ -9,15 +9,15 @@ export const submitPayment = async (data: Payment) => {
       'Logging payment form user action',
       {
         componentName: 'PaymentForm',
-        loggerUser: '',
-        environment: '',
-        instanceIdentifier: ''
+        loggerUser: 'Anonymous',
+        environment: process.env.NODE_ENV || 'development',
+        instanceIdentifier: 'Instance_' + Date.now()
       },
       data
     );
     
-    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
-  
+    const response = await axios.post('/api/log/LogInfo', logInfoRequest);
+    
     return {
       statusCode: response.status,
       data: response.data,
@@ -29,5 +29,5 @@ export const submitPayment = async (data: Payment) => {
       statusCode: error?.response?.status || 500,
       data: error?.response?.data || { error: 'Unknown error occurred' },
     };
-  }  
+  }
 };

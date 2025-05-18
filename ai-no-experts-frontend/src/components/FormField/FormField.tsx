@@ -1,6 +1,7 @@
 import { FormControl, InputAdornment, TextField } from '@mui/material';
 import { Field, ErrorMessage } from 'formik';
 import { type FunctionComponent } from 'react';
+import DOMPurify from 'dompurify';
 
 const FormField: FunctionComponent<FormFieldProps> = ({
     endAdornment,    
@@ -12,6 +13,9 @@ const FormField: FunctionComponent<FormFieldProps> = ({
     error = false,
     ...props
 }) => {
+    const sanitizedStartAdornment = startAdornment ? DOMPurify.sanitize(startAdornment) : null;
+    const sanitizedEndAdornment = endAdornment ? DOMPurify.sanitize(endAdornment) : null;
+
     return (
         <FormControl fullWidth margin="normal">
             <Field
@@ -23,8 +27,8 @@ const FormField: FunctionComponent<FormFieldProps> = ({
                 type={type}
                 error={error}
                 InputProps={{
-                    startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    startAdornment: sanitizedStartAdornment ? <InputAdornment position="start" dangerouslySetInnerHTML={{ __html: sanitizedStartAdornment }} /> : null,
+                    endAdornment: sanitizedEndAdornment ? <InputAdornment position="start" dangerouslySetInnerHTML={{ __html: sanitizedEndAdornment }} /> : null,
                 }}
                 {...props}
             />

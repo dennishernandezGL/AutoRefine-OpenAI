@@ -31,9 +31,9 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
                 key={recommendation.field}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
-                <TableCell component="th" scope="row">{recommendation.field}</TableCell>
-                <TableCell align="right">{recommendation.type}</TableCell>
-                <TableCell align="right">{recommendation.justification}</TableCell>
+                <TableCell component="th" scope="row">{sanitizeHtml(recommendation.field)}</TableCell>
+                <TableCell align="right">{sanitizeHtml(recommendation.type)}</TableCell>
+                <TableCell align="right">{sanitizeHtml(recommendation.justification)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -45,6 +45,12 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
 
 interface RecommendationsProps {
   recommendations?: Recommendation[];
+}
+
+function sanitizeHtml(str: string) {
+  const element = document.createElement('div');
+  element.innerText = str;
+  return element.innerHTML;
 }
 
 export default Recommendations;

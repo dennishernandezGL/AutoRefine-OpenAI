@@ -15,9 +15,9 @@ const Homepage = () => {
                 justifyContent: 'center',
             }}> 
                 {/* Team Logo */}
-                <Box sx={{
+                <Box component="div" role="img" aria-label="Team Logo" sx={{
                     backgroundImage: `url(src/assets/aiNoExperts-logo.png)`,
-                    backgroundSize: '100% 100%',
+                    backgroundSize: 'cover',
                     height: '200px',
                     marginRight: '30px',
                     width: '200px',
