@@ -1,5 +1,6 @@
 using Autofac.Extensions.DependencyInjection;
 using DotNetEnv;
+using Services.Helpers;
 using Services.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,25 +12,25 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddCors(
+    options =>
+    {
+        options.AddPolicy("AllowAllOrigins",
+            builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+    });
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-builder.Services.AddSingleton<GithubService>()
-    ;
-/*builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
-{
-    // Register services with Autofac
-    containerBuilder.RegisterType<GreetingService>().As<IGreetingService>();
-});*/
+builder.Services.AddSingleton<GithubService>();
+builder.Services.AddSingleton<MixpanelService>();
 
-// Inject configuration file
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-// Register services here (DI container)
-//builder.Services.AddScoped<IGreetingService, GreetingService>();
 builder.Services.AddControllers();
 
-// (Optional) Add Swagger
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -41,6 +42,7 @@ if (app.Environment.IsDevelopment())
     //app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAllOrigins");
 app.UseSwagger();
 app.UseSwaggerUI();
 app.MapControllers();

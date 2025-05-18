@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Services.Helpers;
 using Services.Logging;
@@ -32,7 +33,7 @@ namespace Services.Services
                 return NotFound("No logs found for the specified date range.");
             }
 
-            return Ok(logs);
+            return new JsonResult(logs);
         }
 
         [HttpPost("retrieve-logs-by-context")]
