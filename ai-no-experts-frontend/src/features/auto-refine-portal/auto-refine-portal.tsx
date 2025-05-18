@@ -23,13 +23,13 @@ const AutoRefinePortal = () => {
             
             const response = await submitPayment(values);
             
-            if (response.statusCode === 200) {
+            if (response?.statusCode === 200) {
                 setSuccessMessage(response.data);
             } else {
-                const errors = response.data?.errors;
+                const errors = response?.data?.errors;
                 if (errors) {
                     const errorMessages = Object.entries(errors)
-                        .map(([field, messages]: any) => `${field}: ${messages.join(', ')}`)
+                        .map(([field, messages]: [string, string[]]) => `${field}: ${messages.join(', ')}`)
                         .join(' | ');
 
                     setErrorMessage(errorMessages);
@@ -38,11 +38,11 @@ const AutoRefinePortal = () => {
                 }
             }
 
-            setIsLoading(false);
-        } catch (error: any) {
-            setIsLoading(false);
+        } catch (error) {
             console.error('Submission error:', error);
-            setErrorMessage(`Error: ${error.message}`);
+            setErrorMessage(`Error: ${error?.message}`);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -50,7 +50,7 @@ const AutoRefinePortal = () => {
         <Container maxWidth='lg'>
             {/* Payment Form */}
             <Box>
-                <PaymentForm onSubmit={(values: any) => onPaymentFormSubmit(values)} />
+                <PaymentForm onSubmit={(values: Payment) => onPaymentFormSubmit(values)} />
             </Box>
 
             {/* Recommendations */}
