@@ -65,51 +65,67 @@ public class Function
         return "All Good Here!";
     }
     
-    private async Task<string> AnalyzeCodeAndLogs(List<RepositoryFile> files, string logs)
+    private async Task<List<dynamic>> AnalyzeCodeAndLogs(List<RepositoryFile> files, string logs)
     {
+        var analysisResults = new List<dynamic>();
+
         try
         {
-            var messages = new List<ChatMessage>
-            {
-                ChatMessage.CreateSystemMessage(@"I want you to act as an expert assistant in software development and code review.
-                You have access to a GitHub repository and can analyze source code files in a workspace.
-                When I provide you with a specific error or error message, do the following:
-                Analyze the relevant code to identify the root cause of the error, indicating the file and the affected line(s).
-                Propose a detailed solution.
-                Generate the exact code snippet that needs to be replaced or added.")
-            };
-
-            var codeContent = new StringBuilder();
-            codeContent.AppendLine("# CODE FILES\n");
-            
             foreach (var file in files)
             {
-                if (codeContent.Length > 100000)
+                if (!file.Path.EndsWith(".html") && !file.Path.EndsWith(".js") && !file.Path.EndsWith(".ts") && !file.Path.EndsWith(".tsx"))
                 {
-                    codeContent.AppendLine("... [LIMIT REACHED] ...");
-                    break;
+                    continue;
                 }
-                
-                codeContent.AppendLine($"## FILE: {file.Path}\n```\n{file.Content}\n```\n");
-            }
-            
-            messages.Add(ChatMessage.CreateUserMessage(codeContent.ToString()));
-            
-            if (!string.IsNullOrEmpty(logs))
-            {
-                string trimmedLogs = logs.Length > 50000 ? logs.Substring(0, 50000) + "... [LIMIT REACHED]" : logs;
-                messages.Add(ChatMessage.CreateUserMessage( $"# LOGS\n```\n{trimmedLogs}\n```"));
-            }
 
-            messages.Add(ChatMessage.CreateUserMessage( @"Please return only the code snippet with reason of the change, filepath, physical file lines (same as file editor), and code change, in json format."));
+                var messages = new List<ChatMessage>
+                {
+                    ChatMessage.CreateSystemMessage(@"I want you to act as an expert assistant in software development and code review.
+                    You have access to a GitHub repository and can analyze source code files in a workspace.
+                    When I provide you with a specific file, do the following:
+                    Analyze the file to identify potential issues and security vulnerabilities.
+                    Propose a detailed solution.
+                    Generate the exact code snippet that needs to be replaced or added.")
+                };
 
-            var client = new ChatClient(model: "gpt-4o", apiKey: "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");
-            var result = await client.CompleteChatAsync(messages);
-            return result.Value.Content[0].Text;
+                var fileContent = $"## FILE: {file.Path}\n```\n{file.Content}\n```";
+                messages.Add(ChatMessage.CreateUserMessage(fileContent));
+
+                if (!string.IsNullOrEmpty(logs))
+                {
+                    string trimmedLogs = logs.Length > 50000 ? logs.Substring(0, 50000) + "... [LIMIT REACHED]" : logs;
+                    messages.Add(ChatMessage.CreateUserMessage($"# LOGS\n```\n{trimmedLogs}\n```"));
+                }
+
+                messages.Add(ChatMessage.CreateUserMessage(@"Please analyze the file and return the entire updated file in JSON format with the following structure:
+                {
+                    'filepath': '<file_path>',
+                    'lines': [
+                        { 'lineNumber': <line_number>, 'currentValue': '<current_line_content>', 'newValue': '<new_line_content>' },
+                        ...
+                    ]
+                }
+                Ensure that each line in the 'lines' array corresponds to the actual line number in the file, and the 'currentValue' matches the original content of the line, while 'newValue' contains the updated content if any changes are suggested. If no changes are needed for a line, 'newValue' should be the same as 'currentValue'."));
+
+                var apiKey = Environment.GetEnvironmentVariable("CHATGPT_API_KEY");
+                var client = new ChatClient(model: "gpt-4o", apiKey: apiKey);
+                var result = await client.CompleteChatAsync(messages);
+
+                if (result != null && result.Value != null && result.Value.Content.Count > 0)
+                {
+                    var analysisResult = result.Value.Content[0].Text;
+                    analysisResults.Add(analysisResult);
+                }
+            }
         }
         catch (Exception ex)
         {
-            return $"Error al analizar el código con OpenAI: {ex.Message}";
+            analysisResults.Add(new
+            {
+                Error = $"Error analyzing file: {ex.Message}"
+            });
         }
+
+        return analysisResults;
     }
 }
