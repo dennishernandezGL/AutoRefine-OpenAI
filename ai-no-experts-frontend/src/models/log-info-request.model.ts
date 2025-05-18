@@ -1,4 +1,4 @@
-export class LogInfoRequest {    
+export class LogInfoRequest {
     context: {
         componentName: string;
         loggerUser: string;
@@ -7,24 +7,29 @@ export class LogInfoRequest {
     };
     message: string;
     object: string;
-    
-    constructor (
+
+    constructor(
         message: string = '',
         context: {
-          componentName?: string;
-          loggerUser?: string;
-          environment?: string;
-          instanceIdentifier?: string;
+            componentName?: string;
+            loggerUser?: string;
+            environment?: string;
+            instanceIdentifier?: string;
         } = {},
         data: object = {}
-      ) {
+    ) {
         this.message = message;
         this.context = {
-          componentName: context.componentName || '',
-          loggerUser: context.loggerUser || '',
-          environment: context.environment || '',
-          instanceIdentifier: context.instanceIdentifier || '',
+            componentName: context.componentName?.trim() || 'unknown',
+            loggerUser: context.loggerUser?.trim() || 'anonymous',
+            environment: context.environment?.trim() || 'none',
+            instanceIdentifier: context.instanceIdentifier?.trim() || 'none',
         };
-        this.object = JSON.stringify(data);
-      }
+        try {
+            this.object = JSON.stringify(data);
+        } catch (error) {
+            console.error('Error stringifying object:', error);
+            this.object = '{}';
+        }
+    }
 }

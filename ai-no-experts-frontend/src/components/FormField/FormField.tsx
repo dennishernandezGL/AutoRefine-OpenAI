@@ -24,7 +24,7 @@ const FormField: FunctionComponent<FormFieldProps> = ({
                 error={error}
                 InputProps={{
                     startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    endAdornment: endAdornment ? <InputAdornment position="end">{endAdornment}</InputAdornment> : null,
                 }}
                 {...props}
             />

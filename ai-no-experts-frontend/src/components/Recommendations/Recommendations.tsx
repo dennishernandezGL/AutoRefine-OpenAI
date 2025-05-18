@@ -14,31 +14,35 @@ const Recommendations: FunctionComponent<RecommendationsProps> = ({
       </Box>
       
       {/* Table */}
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="Recommendations Table">
-          {/* Header */}
-          <TableHead>
-            <TableRow>
-              <TableCell>Field</TableCell>
-              <TableCell align="right">Type</TableCell>
-              <TableCell align="right">Justification</TableCell>
-            </TableRow>
-          </TableHead>
-          {/* Body */}
-          <TableBody>
-            {recommendations.map((recommendation: Recommendation) => (
-              <TableRow
-                key={recommendation.field}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">{recommendation.field}</TableCell>
-                <TableCell align="right">{recommendation.type}</TableCell>
-                <TableCell align="right">{recommendation.justification}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {recommendations.length > 0 ? (
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="Recommendations Table">
+              {/* Header */}
+              <TableHead>
+                <TableRow>
+                  <TableCell>Field</TableCell>
+                  <TableCell align="right">Type</TableCell>
+                  <TableCell align="right">Justification</TableCell>
+                </TableRow>
+              </TableHead>
+              {/* Body */}
+              <TableBody>
+                {recommendations.map((recommendation: Recommendation) => (
+                  <TableRow
+                    key={recommendation.field}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">{recommendation.field}</TableCell>
+                    <TableCell align="right">{recommendation.type}</TableCell>
+                    <TableCell align="right">{recommendation.justification}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+      ) : (
+        <Typography>No recommendations available.</Typography>
+      )}
     </Container>    
   );
 }

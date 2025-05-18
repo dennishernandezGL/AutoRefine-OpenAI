@@ -8,7 +8,7 @@ const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
     open = false, 
     severity = 'error',
     verticalPosition = 'bottom',
-    onClose 
+    onClose = () => {} // Add default function to prevent errors if not provided
 }) => {
   const [isOpen, setIsOpen] = useState(open);
 
@@ -19,7 +19,8 @@ const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
   const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setIsOpen(false);
-    onClose();
+    // Safely call onClose if it's a function
+    if (typeof onClose === 'function') onClose();
   };
 
   return (
@@ -43,7 +44,7 @@ interface SnackbarComponentProps {
     open: boolean;
     severity?: 'error' | 'success' | 'info' | 'warning';
     verticalPosition?: SnackbarOrigin['vertical'];
-    onClose: () => void;
+    onClose?: () => void; // Mark onClose as optional
 }
 
 export default SnackbarComponent;
