@@ -9,21 +9,21 @@ export const submitPayment = async (data: Payment) => {
       'Logging payment form user action',
       {
         componentName: 'PaymentForm',
-        loggerUser: '',
-        environment: '',
-        instanceIdentifier: ''
+        loggerUser: 'ANON', // Provide default or actual username
+        environment: process.env.NODE_ENV || 'development', // Set environment to actual or default
+        instanceIdentifier: 'instanceID1' // Set your unique instance ID
       },
       data
     );
     
-    const response = await axios.post('http://localhost:5050/api/log/LogInfo', logInfoRequest);
-  
+    const response = await axios.post('/api/log/LogInfo', logInfoRequest); // Changed to relative URL
+
     return {
       statusCode: response.status,
       data: response.data,
     };
   } catch (error: any) {
-    console.error('submitPayment error:', error);
+    console.error('Unable to process the payment:', error);
     
     return {
       statusCode: error?.response?.status || 500,

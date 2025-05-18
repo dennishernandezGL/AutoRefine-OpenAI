@@ -6,6 +6,17 @@ const axiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true, // Allow sending cookies with requests
 });
+
+axiosInstance.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 401) {
+            // Handle unauthorized error, e.g., redirect to login
+        }
+        return Promise.reject(error);
+    }
+);
 
 export default axiosInstance;
