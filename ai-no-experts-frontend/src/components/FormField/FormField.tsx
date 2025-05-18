@@ -12,23 +12,31 @@ const FormField: FunctionComponent<FormFieldProps> = ({
     error = false,
     ...props
 }) => {
+    // Sanitize input values to prevent XSS
+    const sanitizeInput = (input: string) => {
+        return input.replace(/[&<>"]/g, function(tag) {
+            const charsToReplace = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+            return charsToReplace[tag] || tag;
+        });
+    };
+
     return (
         <FormControl fullWidth margin="normal">
             <Field
                 as={TextField}
                 fullWidth
-                id={name}
-                name={name}
-                label={label}
+                id={sanitizeInput(name)}
+                name={sanitizeInput(name)}
+                label={sanitizeInput(label)}
                 type={type}
                 error={error}
                 InputProps={{
-                    startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    startAdornment: startAdornment ? <InputAdornment position="start">{sanitizeInput(startAdornment)}</InputAdornment> : null,
+                    endAdornment: endAdornment ? <InputAdornment position="end">{sanitizeInput(endAdornment)}</InputAdornment> : null,
                 }}
                 {...props}
             />
-            <ErrorMessage className='form-error' name={name} component="p" />
+            <ErrorMessage className='form-error' name={sanitizeInput(name)} component="p" />
         </FormControl>
     );
 }

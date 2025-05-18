@@ -19,7 +19,9 @@ const SnackbarComponent: FunctionComponent<SnackbarComponentProps> = ({
   const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     setIsOpen(false);
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -43,7 +45,7 @@ interface SnackbarComponentProps {
     open: boolean;
     severity?: 'error' | 'success' | 'info' | 'warning';
     verticalPosition?: SnackbarOrigin['vertical'];
-    onClose: () => void;
+    onClose?: () => void; // Made this optional
 }
 
 export default SnackbarComponent;
