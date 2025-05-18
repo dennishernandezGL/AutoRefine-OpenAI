@@ -12,11 +12,20 @@ const FormField: FunctionComponent<FormFieldProps> = ({
     error = false,
     ...props
 }) => {
+    // Validate that name and label are not empty as they are crucial for form fields
+    if (!name) {
+        console.error("FormField component: 'name' prop should not be empty.");
+        return null;
+    }
+    if (!label) {
+        console.error("FormField component: 'label' prop should not be empty.");
+        return null;
+    }
     return (
-        <FormControl fullWidth margin="normal">
+        <FormControl fullWidth={fullWidth} margin="normal">
             <Field
                 as={TextField}
-                fullWidth
+                fullWidth={fullWidth}
                 id={name}
                 name={name}
                 label={label}
@@ -24,7 +33,7 @@ const FormField: FunctionComponent<FormFieldProps> = ({
                 error={error}
                 InputProps={{
                     startAdornment: startAdornment ? <InputAdornment position="start">{startAdornment}</InputAdornment> : null,
-                    endAdornment: endAdornment ? <InputAdornment position="start">{endAdornment}</InputAdornment> : null,
+                    endAdornment: endAdornment ? <InputAdornment position="end">{endAdornment}</InputAdornment> : null,
                 }}
                 {...props}
             />

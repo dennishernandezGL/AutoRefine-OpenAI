@@ -20,6 +20,11 @@ const AutoRefinePortal = () => {
         try {
             setIsLoading(true);
             setErrorMessage('');
+
+            // Basic validation
+            if (!values.amount || values.amount <= 0) {
+                throw new Error("Invalid payment amount.");
+            }
             
             const response = await submitPayment(values);
             
@@ -50,7 +55,7 @@ const AutoRefinePortal = () => {
         <Container maxWidth='lg'>
             {/* Payment Form */}
             <Box>
-                <PaymentForm onSubmit={(values: any) => onPaymentFormSubmit(values)} />
+                <PaymentForm onSubmit={(values: Payment) => onPaymentFormSubmit(values)} />
             </Box>
 
             {/* Recommendations */}

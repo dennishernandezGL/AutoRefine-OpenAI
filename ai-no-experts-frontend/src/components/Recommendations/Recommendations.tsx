@@ -1,16 +1,21 @@
 import { Box, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useEffect } from 'react';
 
 import type { Recommendation } from '../../models/log.model';
 
 const Recommendations: FunctionComponent<RecommendationsProps> = ({
     recommendations = [],
 }) => {
+  useEffect(() => {
+    // Log recommendations length for analytics
+    console.log(`Number of recommendations: ${recommendations.length}`);
+  }, [recommendations]);
+
   return (
     <Container>
       {/* Title */}
       <Box sx={{ marginBottom: '30px' }}>
-        <Typography component={'h1'} sx={{ fontFamily: 'Agdasima', fontSize: '30px'}}>AI Recommendations:</Typography>
+        <Typography component={'h1'} sx={{ fontFamily: 'Agdasima', fontSize: '30px', fontWeight: 'bold'}}>AI Recommendations:</Typography>
       </Box>
       
       {/* Table */}
